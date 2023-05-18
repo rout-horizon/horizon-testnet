@@ -1,0 +1,8 @@
+[
+	{
+		"kind": "pyth",
+		"oracle": "0xd7308b14BF4008e7C7196eC35610B1427C5702EA",
+		"asset": "zBNB",
+		"feedId": "0xecf553770d9b10965f8fb64771e93f5690a182edc32be4a3236e0caaa6e0581a"
+	}
+]

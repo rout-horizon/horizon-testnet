@@ -86,9 +86,9 @@ module.exports = {
 			chainId: 56,
 			accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
 		},
-		testnet: {
-			url: process.env.PROVIDER_URL || 'http://localhost:8545',
-			chainId: 97,
+		goerli: {
+			url: process.env.PROVIDER_URL?.replace('network', 'goerli') || 'http://localhost:8545',
+			chainId: 5,
 		},
 		local: {
 			url: process.env.PROVIDER_URL || 'http://localhost:8545/',
@@ -96,6 +96,7 @@ module.exports = {
 		'local-ovm': {
 			url: process.env.OVM_PROVIDER_URL || 'http://localhost:9545/',
 		},
+
 	},
 	gasReporter: {
 		enabled: false,
@@ -111,7 +112,7 @@ module.exports = {
 	},
 	etherscan: {
 		apiKey: {
-			testnet: process.env.ETHERSCAN_KEY,
+			goerli: process.env.ETHERSCAN_KEY,
 		},
 	},
 	cannon: {

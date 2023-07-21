@@ -8,7 +8,7 @@ const { red, gray, yellow } = require('chalk');
 const { releases } = require('../../../.');
 
 const DEFAULTS = {
-	network: 'testnet',
+	network: 'goerli',
 };
 
 const { stringify, loadAndCheckRequiredSources } = require('../util');

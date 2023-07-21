@@ -163,8 +163,8 @@ const loadAndCheckRequiredSources = ({ deploymentPath, network, freshDeploy }) =
 
 const getExplorerLinkPrefix = ({ network, useOvm }) => {
 	return `https://${network !== 'mainnet' ? network + (useOvm ? '-' : '.') : ''}${
-		useOvm ? 'explorer.optimism' : 'bscscan'
-	}.com`;
+		useOvm ? 'explorer.optimism' : 'etherscan'
+	}.io`;
 };
 
 const loadConnections = ({ network, useFork, useOvm }) => {
@@ -194,7 +194,9 @@ const loadConnections = ({ network, useFork, useOvm }) => {
 
 	const etherscanUrl = `https://api${network !== 'mainnet' ? `-${network}` : ''}${
 		useOvm ? '-optimistic' : ''
-	}.bscscan.com/api`;
+	}.etherscan.io/api`;
+
+	console.log("*******etherscanUrl******", etherscanUrl);
 
 	const explorerLinkPrefix = getExplorerLinkPrefix({ network, useOvm });
 

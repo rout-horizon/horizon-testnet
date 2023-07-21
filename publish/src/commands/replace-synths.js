@@ -328,7 +328,7 @@ module.exports = {
 				'Priority gas fee price in GWEI',
 				DEFAULTS.priorityGasPrice
 			)
-			.option('-n, --network <value>', 'The network to run off.', (x) => x.toLowerCase(), 'testnet')
+			.option('-n, --network <value>', 'The network to run off.', (x) => x.toLowerCase(), 'goerli')
 			.option(
 				'-s, --synths-to-replace <value>',
 				'The list of synths to replace',

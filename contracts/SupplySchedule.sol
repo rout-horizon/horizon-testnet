@@ -27,7 +27,7 @@ contract SupplySchedule is Owned, ISupplySchedule {
     // Counter for number of weeks since the start of supply inflation
     uint public weekCounter;
 
-    uint public constant INFLATION_START_DATE = 1551830400; // 2019-03-06T00:00:00+00:00
+    uint public constant INFLATION_START_DATE = 1689964200; // 2019-03-06T00:00:00+00:00
 
     // The number of HZN rewarded to the caller of Synthetix.mint()
     uint public minterReward = 100 * 1e18;

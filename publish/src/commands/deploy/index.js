@@ -51,7 +51,7 @@ const systemAndParameterCheck = require('./system-and-parameter-check');
 const DEFAULTS = {
 	priorityGasPrice: '1',
 	debtSnapshotMaxDeviation: 0.01, // a 1 percent deviation will trigger a snapshot
-	network: 'testnet',
+	network: 'goerli',
 	buildPath: path.join(__dirname, '..', '..', '..', '..', BUILD_FOLDER),
 };
 

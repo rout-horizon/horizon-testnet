@@ -1,10 +1,13 @@
 'use strict';
 
 const ethers = require('ethers');
-const { EthersAdapter } = require('@gnosis.pm/safe-core-sdk');
+const { EthersAdapter } = require('@safe-global/protocol-kit');
+const Safe = require('@safe-global/protocol-kit');
 const GnosisSafe = require('@gnosis.pm/safe-core-sdk').default;
 const SafeServiceClient = require('@gnosis.pm/safe-service-client').default;
+const SafeApiKit = require('@safe-global/api-kit');
 
+const txServiceUrl = `https://safe-transaction${network === 'goerli' ? '-goerli' : ''}.safe.global`;
 class SafeBatchSubmitter {
 	constructor({ network, signer, safeAddress }) {
 		this.network = network;
@@ -15,18 +18,20 @@ class SafeBatchSubmitter {
 			ethers,
 			signer,
 		});
+		
 
-		this.service = new SafeServiceClient(
-			`https://safe-transaction${network === 'goerli' ? '.goerli' : ''}.gnosis.io`
+		this.service = new SafeApiKit(
+			txServiceUrl,
+			this.ethAdapter
 		);
 	}
 
 	async init() {
 		const { ethAdapter, service, safeAddress, signer } = this;
 		this.transactions = [];
-		this.safe = await GnosisSafe.create({
-			ethAdapter,
+		this.safe = await Safe.create({
 			safeAddress,
+			ethAdapter,
 		});
 		// check if signer is on the list of owners
 		if (!(await this.safe.isOwner(signer.address))) {
@@ -93,7 +98,12 @@ class SafeBatchSubmitter {
 		const senderAddress = await signer.getAddress();
 
 		try {
-			await service.proposeTransaction({ safeAddress, senderAddress, safeTransaction, safeTxHash });
+			await service.proposeTransaction({
+				safeAddress,
+				safeTransactionData: safeTransaction.data,
+				safeTxHash,
+				senderAddress: senderAddress,
+			});
 
 			return { transactions, nonce };
 		} catch (err) {

@@ -82,16 +82,16 @@ module.exports = async ({ addressOf, deployer, runStep }) => {
 	// this can only happen once, as this contract is immutable
 	// TODO: after release add to non-upgradable.json
 	// This step is performed last because beyond this point any new entries on previous contract will be ignored
-	await runStep({
-		contract: 'RewardEscrowV2Storage',
-		target: RewardEscrowV2Storage,
-		read: 'fallbackRewardEscrow',
-		expected: input => input !== ZERO_ADDRESS, // only configure if not configured
-		write: 'setFallbackRewardEscrow',
-		writeArg: addressOf(frozenOrPreviousEscrow),
-		comment:
-			'Ensure that RewardEscrowV2Storage contract is initialized with address of RewardEscrowV2Frozen',
-	});
+	// await runStep({
+	// 	contract: 'RewardEscrowV2Storage',
+	// 	target: RewardEscrowV2Storage,
+	// 	read: 'fallbackRewardEscrow',
+	// 	expected: input => input !== ZERO_ADDRESS, // only configure if not configured
+	// 	write: 'setFallbackRewardEscrow',
+	// 	writeArg: addressOf(frozenOrPreviousEscrow),
+	// 	comment:
+	// 		'Ensure that RewardEscrowV2Storage contract is initialized with address of RewardEscrowV2Frozen',
+	// });
 
 	// RewardEscrow on RewardsDistribution should be set to new RewardEscrowV2
 	await runStep({

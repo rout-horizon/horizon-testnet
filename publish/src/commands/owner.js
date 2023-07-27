@@ -86,7 +86,8 @@ const owner = async ({
 	}
 
 	const provider = new ethers.providers.JsonRpcProvider(providerUrl);
-
+	
+	// console.log(gray('********** privateKey', privateKey));
 	let signer;
 	if (!privateKey) {
 		const account = getUsers({ network, user: 'owner', useOvm }).address;
@@ -102,6 +103,7 @@ const owner = async ({
 
 	let safeBatchSubmitter;
 	if (!useFork) {
+		// console.log(gray('********** SIGNER', signer, signer[1]));
 		safeBatchSubmitter = await safeInitializer({ network, signer, safeAddress: newOwner });
 	}
 
@@ -200,7 +202,7 @@ const owner = async ({
 
 		entry.complete = true;
 		if (safeBatchSubmitter && !useFork) {
-			console.log(gray(`Attempting to append`, yellow(key), `to the batch`));
+			console.log(gray(`Attempting to append`, yellow(key), `to the batch HERE 1`));
 			const { appended } = await safeBatchSubmitter.appendTransaction({
 				to: target,
 				data,
@@ -280,7 +282,7 @@ const owner = async ({
 
 				if (safeBatchSubmitter && !useFork) {
 					console.log(
-						gray(`Attempting to append`, yellow(`${contract}.acceptOwnership()`), `to the batch`)
+						gray(`Attempting to append`, yellow(`${contract}.acceptOwnership()`), `to the batch HERE 2`)
 					);
 					const { appended } = await safeBatchSubmitter.appendTransaction({
 						to: address,
@@ -395,6 +397,7 @@ const owner = async ({
 				ethers.BigNumber.from('10000000'),
 			]);
 			if (safeBatchSubmitter) {
+				console.log("APPEND TX HERE 3")
 				await safeBatchSubmitter.appendTransaction({
 					to: OwnerRelayOnEthereum.address,
 					data: batchData,

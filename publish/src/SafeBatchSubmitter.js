@@ -2,36 +2,37 @@
 
 const ethers = require('ethers');
 const { EthersAdapter } = require('@safe-global/protocol-kit');
-const Safe = require('@safe-global/protocol-kit');
-const GnosisSafe = require('@gnosis.pm/safe-core-sdk').default;
-const SafeServiceClient = require('@gnosis.pm/safe-service-client').default;
-const SafeApiKit = require('@safe-global/api-kit');
+const Safe = require('@safe-global/protocol-kit').default;
+// const GnosisSafe = require('@gnosis.pm/safe-core-sdk').default;
+// const SafeServiceClient = require('@gnosis.pm/safe-service-client').default;
+const SafeApiKit = require('@safe-global/api-kit').default;
 
-const txServiceUrl = `https://safe-transaction${network === 'goerli' ? '-goerli' : ''}.safe.global`;
+// const safeService = 
 class SafeBatchSubmitter {
 	constructor({ network, signer, safeAddress }) {
 		this.network = network;
 		this.signer = signer;
 		this.safeAddress = safeAddress;
-
+		
 		this.ethAdapter = new EthersAdapter({
 			ethers,
-			signer,
+			signerOrProvider: signer,
 		});
 		
+		const txServiceUrl = `https://safe-transaction${network === 'goerli' ? '-goerli' : ''}.safe.global`;
 
-		this.service = new SafeApiKit(
-			txServiceUrl,
-			this.ethAdapter
-		);
+		this.service = new SafeApiKit({
+			txServiceUrl: `https://safe-transaction${network === 'goerli' ? '-goerli' : ''}.safe.global`,
+			ethAdapter: this.ethAdapter
+		});
 	}
 
 	async init() {
 		const { ethAdapter, service, safeAddress, signer } = this;
 		this.transactions = [];
 		this.safe = await Safe.create({
+			ethAdapter:ethAdapter,
 			safeAddress,
-			ethAdapter,
 		});
 		// check if signer is on the list of owners
 		if (!(await this.safe.isOwner(signer.address))) {
@@ -44,7 +45,10 @@ class SafeBatchSubmitter {
 
 	async appendTransaction({ to, value = '0', data, force }) {
 		const { safe, service, safeAddress, transactions } = this;
+
+		console.log("force1", force);
 		if (!force) {
+			console.log("force2", force);
 			// check it does not exist in the pending list
 			// Note: this means that a duplicate transaction - like an acceptOwnership on
 			// the same contract cannot be added in one batch. This could be useful in situations
@@ -80,7 +84,8 @@ class SafeBatchSubmitter {
 			}
 		}
 
-		transactions.push({ to, value, data, nonce: this.unusedNoncePosition });
+		transactions.push({ to, data, value, nonce: this.unusedNoncePosition });
+		// transactions.push({ to, data, value });
 		return { appended: true };
 	}
 
@@ -92,23 +97,37 @@ class SafeBatchSubmitter {
 		if (!transactions.length) {
 			return { transactions };
 		}
-		const safeTransaction = await safe.createTransaction(transactions);
-		await safe.signTransaction(safeTransaction);
-		const safeTxHash = await safe.getTransactionHash(safeTransaction);
-		const senderAddress = await signer.getAddress();
-
+		console.log("$$$$$$$$$transactions $$$$$$$$$$$$", transactions);
+		console.log("$$$$$$$$$transactions $$$$$$$$$$$$", typeof(transactions));
+		console.log("HELLOOOOOOOO");
 		try {
+			const safeTransaction = await safe.createTransaction({transactions});
+			await safe.signTransaction(safeTransaction);
+			const safeTxHash = await safe.getTransactionHash(safeTransaction);
+			const senderAddress = await signer.getAddress();
 			await service.proposeTransaction({
 				safeAddress,
 				safeTransactionData: safeTransaction.data,
 				safeTxHash,
 				senderAddress: senderAddress,
 			});
-
+	
 			return { transactions, nonce };
-		} catch (err) {
-			throw Error(`Error trying to submit batch to safe.\n${err}`);
+		} catch (e) {
+			console.log(e instanceof TypeError);
+			console.log(e.message);              // "null has no properties"
+			console.log(e.name);                 // "TypeError"
+			console.log(e.fileName);             // "Scratchpad/1"
+			console.log(e.lineNumber);           // 2
+			console.log(e.columnNumber);         // 2
+			console.log(e.stack);
+			// throw Error(`Error trying to submit batch to safe.\n${err}`);
 		}
+
+		// try {
+		// } catch (err) {
+		// 	throw Error(`Error trying to submit batch to safe.\n${err}`);
+		// }
 	}
 }
 

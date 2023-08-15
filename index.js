@@ -5,19 +5,23 @@ const abiDecoder = require('abi-decoder');
 
 // load the data in explicitly (not programmatically) so webpack knows what to bundle
 const data = {
-	goerli: require('./publish/deployed/goerli'),
+	testnet: require('./publish/deployed/testnet'),
 	mainnet: require('./publish/deployed/mainnet'),
+	goerli: require('./publish/deployed/goerli'),
 };
 
 const assets = require('./publish/assets.json');
 const nonUpgradeable = require('./publish/non-upgradeable.json');
 const releases = require('./publish/releases.json');
 
-const networks = ['local', 'goerli', 'mainnet'];
+const networks = ['local', 'testnet', 'mainnet', 'goerli'];
 
 const chainIdMapping = Object.entries({
 	56: {
 		network: 'mainnet',
+	},
+	97: {
+		network: 'testnet',
 	},
 	5: {
 		network: 'goerli',
@@ -639,6 +643,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 			oracle: '0xaC1ED4Fabbd5204E02950D68b6FC8c446AC95362',
 		}),
 		goerli: Object.assign({}, base),
+		testnet: Object.assign({}, base),
 		local: Object.assign({}, base, {
 			// Deterministic account #0 when using `npx hardhat node`
 			owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',

@@ -85,7 +85,6 @@ class SafeBatchSubmitter {
 		}
 
 		transactions.push({ to, data, value, nonce: this.unusedNoncePosition });
-		// transactions.push({ to, data, value });
 		return { appended: true };
 	}
 
@@ -97,37 +96,32 @@ class SafeBatchSubmitter {
 		if (!transactions.length) {
 			return { transactions };
 		}
-		console.log("$$$$$$$$$transactions $$$$$$$$$$$$", transactions);
-		console.log("$$$$$$$$$transactions $$$$$$$$$$$$", typeof(transactions));
-		console.log("HELLOOOOOOOO");
+
+		console.log("HELLOOOOOOOO", transactions);
 		try {
-			const safeTransaction = await safe.createTransaction({transactions});
-			await safe.signTransaction(safeTransaction);
+			const safeTransaction = await safe.createTransaction({safeTransactionData: transactions});
+			console.log("PROPOSED TXNS DONE1", safeTransaction);
 			const safeTxHash = await safe.getTransactionHash(safeTransaction);
+			console.log("PROPOSED TXNS DONE2", safeTxHash);
+
+			const senderSignature = await safe.signTransactionHash(safeTxHash);
+
 			const senderAddress = await signer.getAddress();
+
+			console.log("PROPOSED TXNS DONE3", senderAddress);
 			await service.proposeTransaction({
-				safeAddress,
+				safeAddress: safeAddress,
 				safeTransactionData: safeTransaction.data,
-				safeTxHash,
+				safeTxHash: safeTxHash,
 				senderAddress: senderAddress,
+			    senderSignature: senderSignature.data,
 			});
-	
+			
+			console.log("PROPOSED TXNS DONE");
 			return { transactions, nonce };
 		} catch (e) {
-			console.log(e instanceof TypeError);
-			console.log(e.message);              // "null has no properties"
-			console.log(e.name);                 // "TypeError"
-			console.log(e.fileName);             // "Scratchpad/1"
-			console.log(e.lineNumber);           // 2
-			console.log(e.columnNumber);         // 2
-			console.log(e.stack);
-			// throw Error(`Error trying to submit batch to safe.\n${err}`);
+			throw Error(`Error trying to submit batch to safe.\n${err}`);
 		}
-
-		// try {
-		// } catch (err) {
-		// 	throw Error(`Error trying to submit batch to safe.\n${err}`);
-		// }
 	}
 }
 

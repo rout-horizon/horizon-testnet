@@ -92,7 +92,7 @@
 				"keccak256": "0xd4a5e55239e133882e1ed426e8789d1d5ab380a038a2c8b280e0085403fe352a"
 			},
 			"RewardEscrowV2Storage": {
-				"address": "0xEEa9118b658eF094F0929B799C27439ECecc904E",
+				"address": "0x15B75CF9bA312429a64fa100600DB0808b0be6B8",
 				"status": "current",
 				"keccak256": "0x10cf5b45844d9334680cd16b9c1a0ab2869e76bc68ff35c6aab5719c355fa419"
 			},

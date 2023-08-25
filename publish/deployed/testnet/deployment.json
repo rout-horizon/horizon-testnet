@@ -185,7 +185,7 @@
 				"0x4004f5f3C17d7cbF68FC781584BaC7B4bB629885",
 				"0x5CF864AFCEc9f67E56106C0B9668D14AF1be4489",
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
-				"10000000000000000000000000000",
+				"10002330000000000000000000000",
 				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
 			]
 		},
@@ -205,11 +205,11 @@
 		},
 		"RewardEscrowV2Storage": {
 			"name": "RewardEscrowV2Storage",
-			"address": "0xEEa9118b658eF094F0929B799C27439ECecc904E",
+			"address": "0x15B75CF9bA312429a64fa100600DB0808b0be6B8",
 			"source": "RewardEscrowV2Storage",
-			"link": "https://testnet.bscscan.com/address/0xEEa9118b658eF094F0929B799C27439ECecc904E",
-			"timestamp": "2023-05-19T16:44:14.000Z",
-			"txn": "https://testnet.bscscan.com/tx/0xa834efb93fc85b05ceb776b7deaac04737dc624576cec8a65ffcffbe4d080613",
+			"link": "https://testnet.bscscan.com/address/0x15B75CF9bA312429a64fa100600DB0808b0be6B8",
+			"timestamp": "2023-08-25T18:46:12.954Z",
+			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
@@ -500,8 +500,8 @@
 			"network": "testnet",
 			"constructorArgs": [
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
-				"0",
-				"0"
+				"1692835200",
+				"233"
 			]
 		},
 		"EscrowChecker": {

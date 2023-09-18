@@ -480,6 +480,19 @@
 		"sign": "",
 		"description": "Maker Dao Dai"
 	},
+	"NVDA": {
+		"asset": "NVDA",
+		"category": "equities",
+		"sign": "",
+		"exchange": "",
+		"description": "Nvidia Corporation"
+	},
+	"AVAX": {
+		"asset": "AVAX",
+		"category": "crypto",
+		"sign": "",
+		"description": "Avalanche"
+	},
 	"DebtRatio": {
 		"asset": "DebtRatio",
 		"category": "crypto",

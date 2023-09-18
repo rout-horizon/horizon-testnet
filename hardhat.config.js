@@ -90,6 +90,10 @@ module.exports = {
 			url: process.env.PROVIDER_URL || 'http://localhost:8545',
 			chainId: 97,
 		},
+		goerli: {
+			url: process.env.PROVIDER_URL?.replace('network', 'goerli') || 'http://localhost:8545',
+			chainId: 5,
+		},
 		local: {
 			url: process.env.PROVIDER_URL || 'http://localhost:8545/',
 		},

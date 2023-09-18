@@ -71,9 +71,6 @@
 	"ZassetzUSD": {
 		"deploy": false
 	},
-	"ZassetzBTC": {
-		"deploy": false
-	},
 	"ProxyFeePool": {
 		"deploy": false
 	},
@@ -81,9 +78,6 @@
 		"deploy": false
 	},
 	"ProxyzUSD": {
-		"deploy": false
-	},
-	"ProxyzBTC": {
 		"deploy": false
 	},
 	"SafeDecimalMath": {
@@ -96,18 +90,6 @@
 		"deploy": false
 	},
 	"TokenStatezUSD": {
-		"deploy": false
-	},
-	"TokenStatezBTC": {
-		"deploy": false
-	},
-	"TokenStatezBNB": {
-		"deploy": false
-	},
-	"ProxyzBNB": {
-		"deploy": false
-	},
-	"ZassetzBNB": {
 		"deploy": false
 	},
 	"FlexibleStorage": {
@@ -140,13 +122,7 @@
 	"RewardEscrowV2": {
 		"deploy": false
 	},
-	"SynthetixBridgeToOptimism": {
-		"deploy": false
-	},
 	"VirtualSynthMastercopy": {
-		"deploy": false
-	},
-	"SynthetixBridgeEscrow": {
 		"deploy": false
 	},
 	"EtherWrapper": {
@@ -215,40 +191,22 @@
 	"PerpsV2ExchangeRate": {
 		"deploy": false
 	},
-	"PerpsV2ProxyBNBPERP": {
+	"TokenStatezBNB": {
 		"deploy": false
 	},
-	"PerpsV2MarketStateBNBPERP": {
+	"ProxyzBNB": {
 		"deploy": false
 	},
-	"PerpsV2MarketBNBPERP": {
+	"ZassetzBNB": {
 		"deploy": false
 	},
-	"PerpsV2MarketViewsBNBPERP": {
+	"TokenStatezBTC": {
 		"deploy": false
 	},
-	"PerpsV2DelayedOrderBNBPERP": {
+	"ProxyzBTC": {
 		"deploy": false
 	},
-	"PerpsV2OffchainDelayedOrderBNBPERP": {
-		"deploy": false
-	},
-	"PerpsV2ProxyBTCPERP": {
-		"deploy": false
-	},
-	"PerpsV2MarketStateBTCPERP": {
-		"deploy": false
-	},
-	"PerpsV2MarketBTCPERP": {
-		"deploy": false
-	},
-	"PerpsV2MarketViewsBTCPERP": {
-		"deploy": false
-	},
-	"PerpsV2DelayedOrderBTCPERP": {
-		"deploy": false
-	},
-	"PerpsV2OffchainDelayedOrderBTCPERP": {
+	"ZassetzBTC": {
 		"deploy": false
 	}
 }

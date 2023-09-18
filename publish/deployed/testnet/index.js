@@ -6,5 +6,5 @@ module.exports = {
 	feeds: require('./feeds.json'),
 	offchainFeeds: require('./offchain-feeds.json'),
 	futuresMarkets: require('./futures-markets.json'),
-	perpsMarkets: require('./perpsv2-markets.json'),
+	perpsv2Markets: require('./perpsv2-markets.json'),
 };

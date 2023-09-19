@@ -205,11 +205,11 @@
 		},
 		"RewardEscrowV2Storage": {
 			"name": "RewardEscrowV2Storage",
-			"address": "0xEEa9118b658eF094F0929B799C27439ECecc904E",
+			"address": "0x15B75CF9bA312429a64fa100600DB0808b0be6B8",
 			"source": "RewardEscrowV2Storage",
-			"link": "https://testnet.bscscan.com/address/0xEEa9118b658eF094F0929B799C27439ECecc904E",
-			"timestamp": "2023-05-19T16:44:14.000Z",
-			"txn": "https://testnet.bscscan.com/tx/0xa834efb93fc85b05ceb776b7deaac04737dc624576cec8a65ffcffbe4d080613",
+			"link": "https://testnet.bscscan.com/address/0x15B75CF9bA312429a64fa100600DB0808b0be6B8",
+			"timestamp": "2023-08-25T18:46:12.954Z",
+			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",

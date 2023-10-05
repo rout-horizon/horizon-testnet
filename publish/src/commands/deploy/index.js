@@ -156,7 +156,7 @@ const deploy = async ({
 
 	console.log(gray('Loading the compiled contracts locally...'));
 	const { earliestCompiledTimestamp, compiled } = loadCompiledFiles({ buildPath });
-
+	
 	const {
 		providerUrl: envProviderUrl,
 		privateKey: envPrivateKey,
@@ -166,7 +166,9 @@ const deploy = async ({
 		useFork,
 		useOvm,
 	});
-
+	
+	console.log(gray('************locally...', network, useFork, useOvm));
+	console.log(gray('************locally...', providerUrl, privateKey, explorerLinkPrefix));
 	if (!providerUrl) {
 		if (!envProviderUrl) {
 			throw new Error('Missing .env key of PROVIDER_URL. Please add and retry.');

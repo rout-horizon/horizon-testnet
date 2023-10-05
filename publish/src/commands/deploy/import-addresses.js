@@ -71,7 +71,8 @@ module.exports = async ({
 			const currentAddress = await AddressResolver.getAddress(resolverName);
 			const contract = deployer.deployedContracts[`OneNet${debtPoolContractName}`];
 
-			if (currentAddress === ethers.constants.AddressZero && contract) {
+			if (contract) {
+				// if (currentAddress === ethers.constants.AddressZero && contract) {
 				console.log(yellow('Importing special aggregator', debtPoolContractName));
 				addressArgs[0].push(resolverName);
 				addressArgs[1].push(contract.address);

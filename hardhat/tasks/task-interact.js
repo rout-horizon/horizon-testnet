@@ -14,7 +14,6 @@ const {
 subtask('interact:load-contracts').setAction(async (args, hre, runSuper) => {
 	// Wrap Synthetix utils for current network
 	const { getPathToNetwork, getTarget, getSource, getPerpsV2ProxiedMarkets } = synthetix.wrap({
-
 		network: hre.network.name,
 		useOvm: false,
 		fs,
@@ -26,7 +25,6 @@ subtask('interact:load-contracts').setAction(async (args, hre, runSuper) => {
 
 	const deploymentPath = getPathToNetwork({ network: hre.network.name, useOvm: false });
 	const deploymentFilePath = path.join(deploymentPath, file);
-
 
 	const deploymentData = JSON.parse(fs.readFileSync(deploymentFilePath));
 	const targets = Object.keys(deploymentData.targets);
@@ -49,23 +47,23 @@ subtask('interact:load-contracts').setAction(async (args, hre, runSuper) => {
 		});
 
 		contracts[target] = new ethers.Contract(targetData.address, sourceData.abi, args.provider);
+	}
 
-		// Add perpV2 markets
-		const perpsV2Proxied = getPerpsV2ProxiedMarkets({
-			network: hre.network.name,
-			fs,
-			deploymentPath,
-		});
+	// Add perpV2 markets
+	const perpsV2Proxied = getPerpsV2ProxiedMarkets({
+		network: hre.network.name,
+		fs,
+		deploymentPath,
+	});
 
-		const perpsV2MarketTargets = Object.keys(perpsV2Proxied);
+	const perpsV2MarketTargets = Object.keys(perpsV2Proxied);
 
-		for (const perpsV2MarketTarget of perpsV2MarketTargets) {
-			contracts['PerpsV2MarketProxied' + perpsV2MarketTarget] = new ethers.Contract(
-				perpsV2Proxied[perpsV2MarketTarget].address,
-				perpsV2Proxied[perpsV2MarketTarget].abi,
-				args.provider
-			);
-		}
+	for (const perpsV2MarketTarget of perpsV2MarketTargets) {
+		contracts['PerpsV2MarketProxied' + perpsV2MarketTarget] = new ethers.Contract(
+			perpsV2Proxied[perpsV2MarketTarget].address,
+			perpsV2Proxied[perpsV2MarketTarget].abi,
+			args.provider
+		);
 	}
 
 	return { ...contracts, ...(await runSuper(args)) };

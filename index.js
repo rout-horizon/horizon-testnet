@@ -8,6 +8,7 @@ const data = {
 	testnet: require('./publish/deployed/testnet'),
 	mainnet: require('./publish/deployed/mainnet'),
 	goerli: require('./publish/deployed/goerli'),
+	local: require('./publish/deployed/local'),
 };
 
 const assets = require('./publish/assets.json');
@@ -680,7 +681,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 
 	const map = {
 		mainnet: Object.assign({}, base, {
-			owner: '0xEb3107117FEAd7de89Cd14D463D340A2E6917769',
+			owner: '0x81752bC7D54a45bdB9005223d61D2CBd33d04857',
 			deployer: '0xDe910777C787903F78C89e7a0bf7F4C435cBB1Fe',
 			marketClosure: '0xC105Ea57Eb434Fbe44690d7Dec2702e4a2FBFCf7',
 			oracle: '0xaC1ED4Fabbd5204E02950D68b6FC8c446AC95362',
@@ -689,7 +690,7 @@ const getUsers = ({ network = 'mainnet', user, useOvm = false } = {}) => {
 		goerli: Object.assign({}, base),
 		local: Object.assign({}, base, {
 			// Deterministic account #0 when using `npx hardhat node`
-			owner: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+			owner: '0x81752bC7D54a45bdB9005223d61D2CBd33d04857',
 		}),
 		'local-ovm': Object.assign({}, base, {
 			// Deterministic account #0 when using `npx hardhat node`

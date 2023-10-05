@@ -19,6 +19,10 @@ task('test:integration:l1', 'run isolated layer 1 production tests')
 	.addFlag('deploy', 'Deploy an l1 instance before running the tests')
 	.addFlag('useSips', 'Use sources from SIPs directly, instead of releases')
 	.addFlag('useFork', 'Run the tests against a fork of mainnet')
+	.addFlag(
+		'ignoreSafetyChecks',
+		'Ignores some validations regarding paths, compiler versions, etc.'
+	)
 	.addOptionalParam(
 		'providerPort',
 		'The target port for the running local chain to test on',
@@ -26,11 +30,11 @@ task('test:integration:l1', 'run isolated layer 1 production tests')
 	)
 	.addOptionalParam('grep', 'test pattern to match (mocha)', '')
 	.setAction(async (taskArguments, hre) => {
-		hre.config.paths.tests = './test/integration/l1/';
+		hre.config.paths.tests = `${hre.config.paths.root}/test/integration/l1`;
 
 		_commonIntegrationTestSettings({ hre, taskArguments });
 
-		const providerUrl = (hre.config.providerUrl = 'http://localhost');
+		const providerUrl = (hre.config.providerUrl = 'http://127.0.0.1');
 		const providerPort = (hre.config.providerPort = taskArguments.providerPort);
 		const useOvm = false;
 		const buildPath = path.join(__dirname, '..', '..', BUILD_FOLDER);
@@ -59,11 +63,17 @@ task('test:integration:l1', 'run isolated layer 1 production tests')
 					providerUrl,
 					useFork: true,
 					useOvm,
+					ignoreSafetyChecks: taskArguments.ignoreSafetyChecks,
 				});
 			} else {
-				await hre.run('cannon:build', { file: 'cannonfile.aggregator.toml' });
-				await hre.run('cannon:build');
+				await deployInstance({
+					useOvm: false,
+					providerUrl,
+					providerPort: providerPort,
+					buildPath: buildPath,
+				});
 			}
+
 			hre.config.addedSynths = synthsToAdd;
 		}
 
@@ -76,6 +86,10 @@ task('test:integration:l2', 'run isolated layer 2 production tests')
 	.addFlag('deploy', 'Deploy an l2 instance before running the tests')
 	.addFlag('useSips', 'Use sources from SIPs directly, instead of releases')
 	.addFlag('useFork', 'Run the tests against a fork of mainnet')
+	.addFlag(
+		'ignoreSafetyChecks',
+		'Ignores some validations regarding paths, compiler versions, etc.'
+	)
 	.addOptionalParam(
 		'providerPort',
 		'The target port for the running local chain to test on',
@@ -83,12 +97,12 @@ task('test:integration:l2', 'run isolated layer 2 production tests')
 	)
 	.addOptionalParam('grep', 'test pattern to match (mocha)', '')
 	.setAction(async (taskArguments, hre) => {
-		hre.config.paths.tests = './test/integration/l2/';
+		hre.config.paths.tests = `${hre.config.paths.root}/test/integration/l2`;
 		hre.config.debugOptimism = taskArguments.debugOptimism;
 
 		_commonIntegrationTestSettings({ hre, taskArguments });
 
-		const providerUrl = (hre.config.providerUrl = 'http://localhost');
+		const providerUrl = (hre.config.providerUrl = 'http://127.0.0.1');
 		hre.config.providerPortL1 = '9545';
 		const providerPortL2 = (hre.config.providerPortL2 = taskArguments.providerPort);
 		const useOvm = true;
@@ -118,13 +132,14 @@ task('test:integration:l2', 'run isolated layer 2 production tests')
 					providerUrl,
 					useFork: true,
 					useOvm,
+					ignoreSafetyChecks: taskArguments.ignoreSafetyChecks,
 				});
 			} else {
-				await hre.run('cannon:build', { file: 'cannonfile.aggregator.toml' });
-				await hre.run('cannon:build', {
-					file: 'cannonfile.optimism.toml',
-					preset: 'local-ovm',
-					options: ['network=local-ovm'],
+				await deployInstance({
+					useOvm: true,
+					providerUrl,
+					providerPort: providerPortL2,
+					buildPath: buildPath,
 				});
 			}
 			hre.config.addedSynths = synthsToAdd;
@@ -138,12 +153,12 @@ task('test:integration:dual', 'run integrated layer 1 and layer 2 production tes
 	.addFlag('compile', 'Compile the l1 instance before running the tests')
 	.addFlag('deploy', 'Deploy the l1 instance before running the tests')
 	.setAction(async (taskArguments, hre) => {
-		hre.config.paths.tests = './test/integration/dual/';
+		hre.config.paths.tests = `${hre.config.paths.root}/test/integration/dual`;
 		hre.config.debugOptimism = taskArguments.debugOptimism;
 
 		_commonIntegrationTestSettings({ hre, taskArguments });
 
-		const providerUrl = (hre.config.providerUrl = 'http://127.0.0.1');
+		const providerUrl = (hre.config.providerUrl = 'http://localhost');
 		const providerPortL1 = (hre.config.providerPortL1 = '9545');
 		const providerPortL2 = (hre.config.providerPortL2 = '8545');
 		const buildPath = path.join(__dirname, '..', '..', BUILD_FOLDER);

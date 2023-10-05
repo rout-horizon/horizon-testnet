@@ -19,7 +19,6 @@ task('node', 'Run a node')
 		}
 		const network = taskArguments.targetNetwork;
 		const useOvm = taskArguments.useOvm;
-
 		if (network !== 'local') {
 			const networkHostReplace = (taskArguments.useOvm ? 'optimism-' : '') + network;
 

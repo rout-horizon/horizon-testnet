@@ -14,5 +14,9 @@
 	{
 		"name": "LIQUIDATE_REWARD",
 		"value": "2000000000000000000"
+	},
+	{
+		"name": "FUTURES_LIQUIDATION_BUFFER_RATIO",
+		"value": "10000000000000000"
 	}
 ]

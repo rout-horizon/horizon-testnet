@@ -82,6 +82,8 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     bytes32 private constant CONTRACT_SYNTHREDEEMER = "SynthRedeemer";
     bytes32 private constant CONTRACT_SYNTHETIXBRIDGETOOPTIMISM = "SynthetixBridgeToOptimism";
     bytes32 private constant CONTRACT_SYNTHETIXBRIDGETOBASE = "SynthetixBridgeToBase";
+    bytes32 private constant CONTRACT_DEBT_MIGRATOR_ON_ETHEREUM = "DebtMigratorOnEthereum";
+    bytes32 private constant CONTRACT_DEBT_MIGRATOR_ON_OPTIMISM = "DebtMigratorOnOptimism";
 
     bytes32 private constant CONTRACT_EXT_AGGREGATOR_ISSUED_SYNTHS = "ext:AggregatorIssuedSynths";
     bytes32 private constant CONTRACT_EXT_AGGREGATOR_DEBT_RATIO = "ext:AggregatorDebtRatio";
@@ -208,6 +210,18 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         return sharesAmount.multiplyDecimalRoundPrecise(rawRatio);
     }
 
+    function _debtShareBalanceOf(address account) internal view returns (uint) {
+        return synthetixDebtShare().balanceOf(account);
+    }
+
+    function _snxBalanceOf(address account) internal view returns (uint) {
+        return synthetixERC20().balanceOf(account);
+    }
+
+    function _rewardEscrowBalanceOf(address account) internal view returns (uint) {
+        return rewardEscrowV2().balanceOf(account);
+    }
+
     function _availableCurrencyKeysWithOptionalSNX(bool withHZN) internal view returns (bytes32[] memory) {
         bytes32[] memory currencyKeys = new bytes32[](availableSynths.length + (withHZN ? 1 : 0));
 
@@ -278,10 +292,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     function _remainingIssuableSynths(
         address _issuer
     ) internal view returns (uint maxIssuable, uint alreadyIssued, uint totalSystemDebt, bool anyRateIsInvalid) {
-        (alreadyIssued, totalSystemDebt, anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(
-            synthetixDebtShare().balanceOf(_issuer),
-            zUSD
-        );
+        (alreadyIssued, totalSystemDebt, anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_debtShareBalanceOf(_issuer), zUSD);
         (uint issuable, bool isInvalid) = _maxIssuableSynths(_issuer);
         maxIssuable = issuable;
         anyRateIsInvalid = anyRateIsInvalid || isInvalid;
@@ -313,10 +324,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     function _collateralisationRatio(address _issuer) internal view returns (uint, bool) {
         uint totalOwnedSynthetix = _collateral(_issuer);
 
-        (uint debtBalance, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(
-            synthetixDebtShare().balanceOf(_issuer),
-            HZN
-        );
+        (uint debtBalance, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_debtShareBalanceOf(_issuer), HZN);
 
         // it's more gas intensive to put this check here if they have 0 HZN, but it complies with the interface
         if (totalOwnedSynthetix == 0) return (0, anyRateIsInvalid);
@@ -325,10 +333,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     }
 
     function _collateral(address account) internal view returns (uint) {
-        return
-            synthetixERC20().balanceOf(account).add(rewardEscrowV2().balanceOf(account)).add(
-                liquidatorRewards().earned(account)
-            );
+        return _snxBalanceOf(account).add(_rewardEscrowBalanceOf(account)).add(liquidatorRewards().earned(account));
     }
 
     function minimumStakeTime() external view returns (uint) {
@@ -374,10 +379,8 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     }
 
     function debtBalanceOf(address _issuer, bytes32 currencyKey) external view returns (uint debtBalance) {
-        ISynthetixDebtShare sds = synthetixDebtShare();
-
         // What was their initial debt ownership?
-        uint debtShareBalance = sds.balanceOf(_issuer);
+        uint debtShareBalance = _debtShareBalanceOf(_issuer);
 
         // If it's zero, they haven't issued, and they have no debt.
         if (debtShareBalance == 0) return 0;
@@ -409,7 +412,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         // 100 HZN to be locked in their wallet to maintain their collateralisation ratio
         // The locked synthetix value can exceed their balance.
         uint debtBalance;
-        (debtBalance, , anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(synthetixDebtShare().balanceOf(account), HZN);
+        (debtBalance, , anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_debtShareBalanceOf(account), HZN);
         uint lockedSynthetixValue = debtBalance.divideDecimalRound(getIssuanceRatio());
 
         // If we exceed the balance, no HZN are transferable, otherwise the difference is.
@@ -596,6 +599,22 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         return rateInvalid;
     }
 
+        /**
+     * SIP-237: Debt Migration
+     * Function used for the one-way migration of all debt and liquid + escrowed SNX from L1 -> L2
+     * @param account The address of the account that is being migrated
+     * @param amount The amount of debt shares moving across layers
+     */
+    function modifyDebtSharesForMigration(address account, uint amount) external onlyTrustedMigrators {
+        ISynthetixDebtShare sds = synthetixDebtShare();
+
+        if (msg.sender == resolver.getAddress(CONTRACT_DEBT_MIGRATOR_ON_ETHEREUM)) {
+            sds.burnShare(account, amount);
+        } else if (msg.sender == resolver.getAddress(CONTRACT_DEBT_MIGRATOR_ON_OPTIMISM)) {
+            sds.mintShare(account, amount);
+        }
+    }
+
     /**
      * Function used to migrate balances from the CollateralShort contract
      * @param short The address of the CollateralShort contract to be upgraded
@@ -701,7 +720,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     {
         // Get the account's debt balance
         bool anyRateIsInvalid;
-        (debtBalance, , anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(synthetixDebtShare().balanceOf(account), zUSD);
+        (debtBalance, , anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_debtShareBalanceOf(account), zUSD);
 
         // Get the SNX rate
         (uint snxRate, bool snxRateInvalid) = _rateAndInvalid(HZN);
@@ -722,7 +741,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
             // Get the minimum values for both totalRedeemed and debtToRemove
             totalRedeemed = _getMinValue(
                 _usdToSnx(debtToRemove, snxRate).multiplyDecimal(SafeDecimalMath.unit().add(penalty)),
-                synthetixERC20().balanceOf(account)
+                _snxBalanceOf(account)
             );
             debtToRemove = _getMinValue(
                 _snxToUSD(totalRedeemed, snxRate).divideDecimal(SafeDecimalMath.unit().add(penalty)),
@@ -748,7 +767,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
                 // need to wipe out the account
                 debtToRemove = debtBalance;
                 totalRedeemed = _collateral(account).sub(rewardsSum);
-                escrowToLiquidate = rewardEscrowV2().balanceOf(account);
+                escrowToLiquidate = _rewardEscrowBalanceOf(account);
                 return (totalRedeemed, debtToRemove, escrowToLiquidate, debtBalance);
             } else {
                 // normal forced liquidation
@@ -768,7 +787,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
     ) internal view returns (uint totalRedeemed, uint escrowToLiquidate) {
         // The balanceOf here can be considered "transferable" since it's not escrowed,
         // and it is the only HZN that can potentially be transfered if unstaked.
-        uint transferable = synthetixERC20().balanceOf(account);
+        uint transferable = _snxBalanceOf(account);
         if (redeemTarget.add(rewardsSum) <= transferable) {
             // transferable is enough
             return (redeemTarget, 0);
@@ -882,10 +901,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
             }
         }
 
-        (uint existingDebt, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(
-            synthetixDebtShare().balanceOf(from),
-            zUSD
-        );
+        (uint existingDebt, , bool anyRateIsInvalid) = _debtBalanceOfAndTotalDebt(_debtShareBalanceOf(from), zUSD);
         (uint maxIssuableSynthsForAccount, bool snxRateInvalid) = _maxIssuableSynths(from);
         _requireRatesNotInvalid(anyRateIsInvalid || snxRateInvalid);
         require(existingDebt > 0, "No debt to forgive");
@@ -934,7 +950,7 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
 
         ISynthetixDebtShare sds = synthetixDebtShare();
 
-        uint currentDebtShare = sds.balanceOf(from);
+        uint currentDebtShare = _debtShareBalanceOf(from);
 
         if (debtToRemove == existingDebt) {
             sds.burnShare(from, currentDebtShare);
@@ -964,6 +980,14 @@ contract Issuer is Owned, MixinSystemSettings, IIssuer {
         address bridgeL2 = resolver.getAddress(CONTRACT_SYNTHETIXBRIDGETOBASE);
         address feePool = resolver.getAddress(CONTRACT_FEEPOOL);
         require(msg.sender == bridgeL1 || msg.sender == bridgeL2 || msg.sender == feePool, "only trusted minters");
+        _;
+    }
+
+    modifier onlyTrustedMigrators() {
+        address migratorL1 = resolver.getAddress(CONTRACT_DEBT_MIGRATOR_ON_ETHEREUM);
+        address migratorL2 = resolver.getAddress(CONTRACT_DEBT_MIGRATOR_ON_OPTIMISM);
+        require(msg.sender == migratorL1 || msg.sender == migratorL2, "only trusted migrators");
+        require(migratorL1 == address(0) || migratorL2 == address(0), "one migrator must be 0x0");
         _;
     }
 

@@ -318,6 +318,18 @@ module.exports = async ({
 		args: [addressOf(readProxyForResolver), account, TEMP_OWNER_DEFAULT_DURATION],
 	});
 
+	// await deployer.deployContract({
+	// 	name: 'DebtMigratorOnEthereum',
+	// 	deps: ['AddressResolver'],
+	// 	args: [account, addressOf(readProxyForResolver)],
+	// });
+
+	// await deployer.deployContract({
+	// 	name: 'DebtMigratorOnOptimism',
+	// 	deps: ['AddressResolver'],
+	// 	args: [account, addressOf(readProxyForResolver)],
+	// });
+
 	await deployer.deployContract({
 		name: 'SynthRedeemer',
 		deps: ['AddressResolver'],

@@ -297,18 +297,18 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         // have already claimed from the old period, available in the new period.
         // The subtraction is important so we don't create a ticking time bomb of an ever growing
         // number of fees that can never decrease and will eventually overflow at the end of the fee pool.
-        _recentFeePeriodsStorage().feesToDistribute = periodToRollover
+        _recentFeePeriodsStorage(0).feesToDistribute = periodToRollover
             .feesToDistribute
             .sub(periodToRollover.feesClaimed)
             .add(periodClosing.feesToDistribute);
-        _recentFeePeriodsStorage().rewardsToDistribute = periodToRollover
+        _recentFeePeriodsStorage(0).rewardsToDistribute = periodToRollover
             .rewardsToDistribute
             .sub(periodToRollover.rewardsClaimed)
             .add(periodClosing.rewardsToDistribute);
 
         // Note: As of SIP-255, all sUSD fee are now automatically burned and are effectively shared amongst stakers in the form of reduced debt.
         if (_recentFeePeriodsStorage(0).feesToDistribute > 0) {
-            issuer().burnSynthsWithoutDebt(sUSD, FEE_ADDRESS, _recentFeePeriodsStorage(0).feesToDistribute);
+            issuer().burnSynthsWithoutDebt(zUSD, FEE_ADDRESS, _recentFeePeriodsStorage(0).feesToDistribute);
             // Mark the burnt fees as claimed.
             _recentFeePeriodsStorage(0).feesClaimed = _recentFeePeriodsStorage(0).feesToDistribute;
         }
@@ -381,13 +381,6 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         // Record the address has claimed for this period
         _setLastFeeWithdrawal(claimingAddress, _recentFeePeriodsStorage(1).feePeriodId);
 
-        // if (availableFees > 0) {
-        //     // Record the fee payment in our recentFeePeriods
-        //     feesPaid = _recordFeePayment(availableFees);
-
-        //     // Send them their fees
-        //     _payFees(claimingAddress, feesPaid);
-        // }
         // Mark the fees as paid since they were already burned.
         feesPaid = availableFees;
 
@@ -435,38 +428,6 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         }
     }
 
-    // /**
-    //  * @notice Record the fee payment in our recentFeePeriods.
-    //  * @param zUSDAmount The amount of fees priced in zUSD.
-    //  */
-    // function _recordFeePayment(uint zUSDAmount) internal returns (uint) {
-    //     // Don't assign to the parameter
-    //     uint remainingToAllocate = zUSDAmount;
-
-    //     uint feesPaid;
-    //     // Start at the oldest period and record the amount, moving to newer periods
-    //     // until we've exhausted the amount.
-    //     // The condition checks for overflow because we're going to 0 with an unsigned int.
-    //     for (uint i = FEE_PERIOD_LENGTH - 1; i < FEE_PERIOD_LENGTH; i--) {
-    //         uint feesAlreadyClaimed = _recentFeePeriodsStorage(i).feesClaimed;
-    //         uint delta = _recentFeePeriodsStorage(i).feesToDistribute.sub(feesAlreadyClaimed);
-
-    //         if (delta > 0) {
-    //             // Take the smaller of the amount left to claim in the period and the amount we need to allocate
-    //             uint amountInPeriod = delta < remainingToAllocate ? delta : remainingToAllocate;
-
-    //             _recentFeePeriodsStorage(i).feesClaimed = feesAlreadyClaimed.add(amountInPeriod);
-    //             remainingToAllocate = remainingToAllocate.sub(amountInPeriod);
-    //             feesPaid = feesPaid.add(amountInPeriod);
-
-    //             // No need to continue iterating if we've recorded the whole amount;
-    //             if (remainingToAllocate == 0) return feesPaid;
-    //         }
-    //     }
-
-    //     return feesPaid;
-    // }
-
     /**
      * @notice Record the reward payment in our recentFeePeriods.
      * @param hznAmount The amount of HZN tokens.
@@ -498,26 +459,6 @@ contract FeePool is Owned, Proxyable, LimitedSetup, MixinSystemSettings, IFeePoo
         }
         return rewardPaid;
     }
-
-    // /**
-    //  * @notice Send the fees to claiming address.
-    //  * @param account The address to send the fees to.
-    //  * @param zUSDAmount The amount of fees priced in zUSD.
-    //  */
-    // function _payFees(address account, uint zUSDAmount) internal notFeeAddress(account) {
-    //     // Grab the zUSD Synth
-    //     ISynth zUSDSynth = issuer().synths(zUSD);
-
-    //     // NOTE: we do not control the FEE_ADDRESS so it is not possible to do an
-    //     // ERC20.approve() transaction to allow this feePool to call ERC20.transferFrom
-    //     // to the accounts address
-
-    //     // Burn the source amount
-    //     zUSDSynth.burn(FEE_ADDRESS, zUSDAmount);
-
-    //     // Mint their new synths
-    //     zUSDSynth.issue(account, zUSDAmount);
-    // }
 
     /**
      * @notice Send the rewards to claiming address - will be locked in rewardEscrow.

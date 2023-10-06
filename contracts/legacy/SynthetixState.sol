@@ -1,13 +1,13 @@
 pragma solidity ^0.5.16;
 
 // Inheritance
-import "./Owned.sol";
-import "./State.sol";
-import "./LimitedSetup.sol";
-import "./interfaces/ISynthetixState.sol";
+import "../Owned.sol";
+import "../State.sol";
+import "../LimitedSetup.sol";
+import "../interfaces/ISynthetixState.sol";
 
 // Libraries
-import "./SafeDecimalMath.sol";
+import "../SafeDecimalMath.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/synthetixstate
 contract SynthetixState is Owned, State, ISynthetixState {

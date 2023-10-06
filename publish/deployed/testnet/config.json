@@ -250,5 +250,23 @@
 	},
 	"PerpsV2OffchainDelayedOrderBTCPERP": {
 		"deploy": false
+	},
+	"TokenStatezETH": {
+		"deploy": false
+	},
+	"ProxyzETH": {
+		"deploy": false
+	},
+	"ZassetzETH": {
+		"deploy": false
+	},
+	"TokenStatezLINK": {
+		"deploy": false
+	},
+	"ProxyzLINK": {
+		"deploy": false
+	},
+	"ZassetzLINK": {
+		"deploy": false
 	}
 }

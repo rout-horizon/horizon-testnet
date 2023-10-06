@@ -185,7 +185,7 @@
 				"0x4004f5f3C17d7cbF68FC781584BaC7B4bB629885",
 				"0x5CF864AFCEc9f67E56106C0B9668D14AF1be4489",
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
-				"10002370000000000000000000000",
+				"10002390000000000000000000000",
 				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
 			]
 		},
@@ -500,8 +500,8 @@
 			"network": "testnet",
 			"constructorArgs": [
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
-				"1695254400",
-				"237"
+				"1696464000",
+				"239"
 			]
 		},
 		"EscrowChecker": {
@@ -1121,6 +1121,94 @@
 				"0xF50e55c2E783cB52FB50232712e7A09C0e7a17e0",
 				"0x7eDB493F25F0E14149D94dA683418d6dc9492FdB",
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
+				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
+			]
+		},
+		"TokenStatezETH": {
+			"name": "TokenStatezETH",
+			"address": "0x36FAc9560227B7060C4a06c165fc42Cf476CD3a3",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0x36FAc9560227B7060C4a06c165fc42Cf476CD3a3",
+			"timestamp": "2023-10-06T12:54:21.392Z",
+			"txn": "",
+			"network": "testnet",
+			"constructorArgs": [
+				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
+				"0x0000000000000000000000000000000000000000"
+			]
+		},
+		"ProxyzETH": {
+			"name": "ProxyzETH",
+			"address": "0x1e9126b984425d77c8377A656a6B7fb16E515263",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0x1e9126b984425d77c8377A656a6B7fb16E515263",
+			"timestamp": "2023-10-06T12:55:03.418Z",
+			"txn": "",
+			"network": "testnet",
+			"constructorArgs": [
+				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7"
+			]
+		},
+		"ZassetzETH": {
+			"name": "ZassetzETH",
+			"address": "0xE30C2ddBcb854601975268f6AEe5E207B56993e9",
+			"source": "MultiCollateralSynth",
+			"link": "https://testnet.bscscan.com/address/0xE30C2ddBcb854601975268f6AEe5E207B56993e9",
+			"timestamp": "2023-10-06T12:55:25.007Z",
+			"txn": "",
+			"network": "testnet",
+			"constructorArgs": [
+				"0x1e9126b984425d77c8377A656a6B7fb16E515263",
+				"0x36FAc9560227B7060C4a06c165fc42Cf476CD3a3",
+				"Zasset zETH",
+				"zETH",
+				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
+				"0x7a45544800000000000000000000000000000000000000000000000000000000",
+				0,
+				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
+			]
+		},
+		"TokenStatezLINK": {
+			"name": "TokenStatezLINK",
+			"address": "0xE2B8e53242dd496a66EFde9939607029E1E8B266",
+			"source": "TokenState",
+			"link": "https://testnet.bscscan.com/address/0xE2B8e53242dd496a66EFde9939607029E1E8B266",
+			"timestamp": "2023-10-06T12:55:45.493Z",
+			"txn": "",
+			"network": "testnet",
+			"constructorArgs": [
+				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
+				"0x0000000000000000000000000000000000000000"
+			]
+		},
+		"ProxyzLINK": {
+			"name": "ProxyzLINK",
+			"address": "0xE200C556358A8FC388f7Cd6e62bc0a2Ee055153F",
+			"source": "ProxyERC20",
+			"link": "https://testnet.bscscan.com/address/0xE200C556358A8FC388f7Cd6e62bc0a2Ee055153F",
+			"timestamp": "2023-10-06T12:56:08.258Z",
+			"txn": "",
+			"network": "testnet",
+			"constructorArgs": [
+				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7"
+			]
+		},
+		"ZassetzLINK": {
+			"name": "ZassetzLINK",
+			"address": "0xA91E395ed07EeC8D42E501818Ae61cBA5869Db85",
+			"source": "MultiCollateralSynth",
+			"link": "https://testnet.bscscan.com/address/0xA91E395ed07EeC8D42E501818Ae61cBA5869Db85",
+			"timestamp": "2023-10-06T12:56:28.341Z",
+			"txn": "",
+			"network": "testnet",
+			"constructorArgs": [
+				"0xE200C556358A8FC388f7Cd6e62bc0a2Ee055153F",
+				"0xE2B8e53242dd496a66EFde9939607029E1E8B266",
+				"Zasset zLINK",
+				"zLINK",
+				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
+				"0x7a4c494e4b000000000000000000000000000000000000000000000000000000",
+				0,
 				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
 			]
 		}

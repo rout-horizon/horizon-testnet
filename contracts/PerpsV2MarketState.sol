@@ -10,6 +10,7 @@ import "./StateShared.sol";
 import "./AddressSetLib.sol";
 
 // https://docs.synthetix.io/contracts/source/contracts/PerpsV2MarketState
+// solhint-disable-next-line max-states-count
 contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
     using AddressSetLib for AddressSetLib.AddressSet;
 
@@ -46,7 +47,7 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
      * since the position was confirmed and multiply it by the position size.
      */
     uint32 public fundingLastRecomputed;
-    int128[] public fundingSequence;
+    int128[] internal _fundingSequence;
 
     /*
      * The funding rate last time it was recomputed. The market funding rate floats and requires the previously
@@ -58,7 +59,7 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
      * Each user's position. Multiple positions can always be merged, so each user has
      * only have one position at a time.
      */
-    mapping(address => Position) public positions;
+    mapping(address => Position) internal _positions;
 
     // The set of all addresses (positions) .
     AddressSetLib.AddressSet internal _positionAddresses;
@@ -70,7 +71,11 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
     uint64 internal _nextPositionId = 1;
 
     /// @dev Holds a mapping of accounts to orders. Only one order per account is supported
-    mapping(address => DelayedOrder) public delayedOrders;
+    mapping(address => DelayedOrder) internal _delayedOrders;
+
+    /// @dev Holds a mapping of accounts to flagger address to flag an account. Only one order per account is supported
+    mapping(address => address) public positionFlagger;
+    AddressSetLib.AddressSet internal _flaggedAddresses;
 
     constructor(
         address _owner,
@@ -82,7 +87,7 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         marketKey = _marketKey;
 
         // Initialise the funding sequence with 0 initially accrued, so that the first usable funding index is 1.
-        fundingSequence.push(0);
+        _fundingSequence.push(0);
 
         fundingRateLastRecomputed = 0;
     }
@@ -96,7 +101,19 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
     }
 
     function fundingSequenceLength() external view returns (uint) {
-        return fundingSequence.length;
+        return _fundingSequence.length;
+    }
+
+    function isFlagged(address account) external view returns (bool) {
+        return positionFlagger[account] != address(0);
+    }
+
+    function positions(address account) external view returns (Position memory) {
+        return _positions[account];
+    }
+
+    function delayedOrders(address account) external view returns (DelayedOrder memory) {
+        return _delayedOrders[account];
     }
 
     function getPositionAddressesPage(uint index, uint pageSize)
@@ -111,17 +128,21 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
     function getDelayedOrderAddressesPage(uint index, uint pageSize)
         external
         view
-        onlyAssociatedContracts
         returns (address[] memory)
     {
         return _delayedOrderAddresses.getPage(index, pageSize);
     }
 
-    function getPositionAddressesLength() external view onlyAssociatedContracts returns (uint) {
+    
+    function getFlaggedAddressesPage(uint index, uint pageSize) external view returns (address[] memory) {
+        return _flaggedAddresses.getPage(index, pageSize);
+    }
+    
+    function getPositionAddressesLength() external view returns (uint) {
         return _positionAddresses.elements.length;
     }
 
-    function getDelayedOrderAddressesLength() external view onlyAssociatedContracts returns (uint) {
+    function getDelayedOrderAddressesLength() external view returns (uint) {
         return _delayedOrderAddresses.elements.length;
     }
 
@@ -155,8 +176,8 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         fundingLastRecomputed = lastRecomputed;
     }
 
-    function pushFundingSequence(int128 _fundingSequence) external onlyAssociatedContracts {
-        fundingSequence.push(_fundingSequence);
+    function pushFundingSequence(int128 fundingSequence) external onlyAssociatedContracts {
+        _fundingSequence.push(fundingSequence);
     }
 
     // TODO: Perform this update when maxFundingVelocity and skewScale are modified.
@@ -182,7 +203,7 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         uint128 lastPrice,
         int128 size
     ) external onlyAssociatedContracts {
-        positions[account] = Position(id, lastFundingIndex, margin, lastPrice, size);
+        _positions[account] = Position(id, lastFundingIndex, margin, lastPrice, size);
         _positionAddresses.add(account);
     }
 
@@ -191,7 +212,7 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
      * @dev Only the associated contract may call this.
      * @param account The account whose value to set.
      * @param sizeDelta Difference in position to pass to modifyPosition
-     * @param priceImpactDelta Price impact tolerance as a percentage used on fillPrice at execution
+     * @param desiredFillPrice Desired fill price as usd used on fillPrice at execution
      * @param targetRoundId Price oracle roundId using which price this order needs to executed
      * @param commitDeposit The commitDeposit paid upon submitting that needs to be refunded if order succeeds
      * @param keeperDeposit The keeperDeposit paid upon submitting that needs to be paid / refunded on tx confirmation
@@ -203,7 +224,7 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         address account,
         bool isOffchain,
         int128 sizeDelta,
-        uint128 priceImpactDelta,
+        uint128 desiredFillPrice,
         uint128 targetRoundId,
         uint128 commitDeposit,
         uint128 keeperDeposit,
@@ -211,10 +232,10 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         uint256 intentionTime,
         bytes32 trackingCode
     ) external onlyAssociatedContracts {
-        delayedOrders[account] = DelayedOrder(
+        _delayedOrders[account] = DelayedOrder(
             isOffchain,
             sizeDelta,
-            priceImpactDelta,
+            desiredFillPrice,
             targetRoundId,
             commitDeposit,
             keeperDeposit,
@@ -231,16 +252,28 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
      * @param account The account whose position should be deleted.
      */
     function deletePosition(address account) external onlyAssociatedContracts {
-        delete positions[account];
+        delete _positions[account];
         if (_positionAddresses.contains(account)) {
             _positionAddresses.remove(account);
         }
     }
 
     function deleteDelayedOrder(address account) external onlyAssociatedContracts {
-        delete delayedOrders[account];
+        delete _delayedOrders[account];
         if (_delayedOrderAddresses.contains(account)) {
             _delayedOrderAddresses.remove(account);
+        }
+    }
+
+    function flag(address account, address flagger) external onlyAssociatedContracts {
+        positionFlagger[account] = flagger;
+        _flaggedAddresses.add(account);
+    }
+
+    function unflag(address account) external onlyAssociatedContracts {
+        delete positionFlagger[account];
+        if (_flaggedAddresses.contains(account)) {
+            _flaggedAddresses.remove(account);
         }
     }
 }

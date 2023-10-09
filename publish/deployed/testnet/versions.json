@@ -85,8 +85,9 @@
 			},
 			"Synthetix": {
 				"address": "0xC5FB4D28d427Cb8fA862AAa5Af3bcA4d9BBd2712",
-				"status": "current",
-				"keccak256": "0x4cd2dca5c79ef104824264ba97f4d803e5e79ea506f38771d3d5bbb50a992832"
+				"status": "replaced",
+				"keccak256": "0x4cd2dca5c79ef104824264ba97f4d803e5e79ea506f38771d3d5bbb50a992832",
+				"replaced_in": "v2.6.0"
 			},
 			"RewardEscrow": {
 				"address": "0x7990D579c9eFd62bA7f4f5839d11821CB6B14F17",
@@ -150,8 +151,9 @@
 			},
 			"FeePool": {
 				"address": "0x93c8397951Fc737dCF5CC6ed73515a68Ee0b9274",
-				"status": "current",
-				"keccak256": "0x652cd2de870873552c63a0b3868089733833262c1392face03ecebe673e82630"
+				"status": "replaced",
+				"keccak256": "0x652cd2de870873552c63a0b3868089733833262c1392face03ecebe673e82630",
+				"replaced_in": "v2.6.0"
 			},
 			"FeePoolState": {
 				"address": "0x0A2A2C842246aF6acbe21342f0a6B5Be8E2Ea693",
@@ -195,8 +197,9 @@
 			},
 			"Issuer": {
 				"address": "0xac7622fEDE70C5DD44B77314F09109a3555996Ac",
-				"status": "current",
-				"keccak256": "0x315b37332def3712b4cdc8e5f0e348acae111f1af3d051a85e18deb23eab560e"
+				"status": "replaced",
+				"keccak256": "0x315b37332def3712b4cdc8e5f0e348acae111f1af3d051a85e18deb23eab560e",
+				"replaced_in": "v2.6.0"
 			},
 			"TradingRewards": {
 				"address": "0xC6adc12AB368E9E4E8dB3a363096067346B3C7ea",
@@ -446,6 +449,69 @@
 				"address": "0x5dD5D12fa105f7297910670357Eb6d7cD0e73b31",
 				"status": "current",
 				"keccak256": "0x42aef39e7aed2117765b269de4035f2daab0d8adde994dc84b85216175010c7a"
+			}
+		}
+	},
+	"v2.5.0": {
+		"tag": "v2.5.0",
+		"fulltag": "v2.5.0",
+		"network": "testnet",
+		"date": "2023-10-06T19:32:29+05:30",
+		"commit": "5c36c26f061d858421029d59f6379021594653fb",
+		"contracts": {
+			"TokenStatezETH": {
+				"address": "0x36FAc9560227B7060C4a06c165fc42Cf476CD3a3",
+				"status": "current",
+				"keccak256": "0xaee86fcae08722f4e43f5776b9111c13646123c0b805597ffa2c82728ebc1799"
+			},
+			"ProxyzETH": {
+				"address": "0x1e9126b984425d77c8377A656a6B7fb16E515263",
+				"status": "current",
+				"keccak256": "0xf3cf134745490970bef26b8d76fa58738cf06b669468d7ad18baf2bf25cac3c0"
+			},
+			"ZassetzETH": {
+				"address": "0xE30C2ddBcb854601975268f6AEe5E207B56993e9",
+				"status": "current",
+				"keccak256": "0xef52c615c011308fe334f08291515383dfb8748b593b23de18102dac5f27732b"
+			},
+			"TokenStatezLINK": {
+				"address": "0xE2B8e53242dd496a66EFde9939607029E1E8B266",
+				"status": "current",
+				"keccak256": "0xaee86fcae08722f4e43f5776b9111c13646123c0b805597ffa2c82728ebc1799"
+			},
+			"ProxyzLINK": {
+				"address": "0xE200C556358A8FC388f7Cd6e62bc0a2Ee055153F",
+				"status": "current",
+				"keccak256": "0xf3cf134745490970bef26b8d76fa58738cf06b669468d7ad18baf2bf25cac3c0"
+			},
+			"ZassetzLINK": {
+				"address": "0xA91E395ed07EeC8D42E501818Ae61cBA5869Db85",
+				"status": "current",
+				"keccak256": "0xef52c615c011308fe334f08291515383dfb8748b593b23de18102dac5f27732b"
+			}
+		}
+	},
+	"v2.6.0": {
+		"tag": "v2.6.0",
+		"fulltag": "v2.6.0",
+		"network": "testnet",
+		"date": "2023-10-06T19:32:29+05:30",
+		"commit": "5c36c26f061d858421029d59f6379021594653fb",
+		"contracts": {
+			"Synthetix": {
+				"address": "0x6126851Ae76482B25f5E4289530A3441E908E67A",
+				"status": "current",
+				"keccak256": "0x38a84ae012a7462c6faa149b33005ad6a0785a544d7cfb6a49c60542dee99c9c"
+			},
+			"FeePool": {
+				"address": "0xE26E1820b376Fa8Dff274055249327eF70348B38",
+				"status": "current",
+				"keccak256": "0xf4ec707be6c1555afecdc6139429e619c185272ad539e76ab7a1f203d8e519fc"
+			},
+			"Issuer": {
+				"address": "0xb56854b620276031c81508EEFa9811d36f14bb13",
+				"status": "current",
+				"keccak256": "0x78ab5f407f4af87603f1ff2728813d5be53335277388ae36cd7ba18e7344e79d"
 			}
 		}
 	}

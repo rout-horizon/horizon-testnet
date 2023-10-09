@@ -595,7 +595,7 @@ contract BaseSynthetix is IERC20, ExternStateToken, MixinResolver, ISynthetix {
             // ordered to reduce gas for more frequent calls, bridge first, vesting and migrating after, legacy last
             caller == resolver.getAddress("SynthetixBridgeToOptimism") ||
             caller == resolver.getAddress("RewardEscrowV2") ||
-            caller == resolver.getAddress("DebtMigratorOnOptimism") ||
+            // caller == resolver.getAddress("DebtMigratorOnOptimism") ||
             // legacy contracts
             caller == resolver.getAddress("RewardEscrow") ||
             caller == resolver.getAddress("SynthetixEscrow") ||

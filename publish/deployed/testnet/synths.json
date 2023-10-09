@@ -19,5 +19,15 @@
 		"name": "zBTC",
 		"asset": "BTC",
 		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "zETH",
+		"asset": "ETH",
+		"subclass": "MultiCollateralSynth"
+	},
+	{
+		"name": "zLINK",
+		"asset": "LINK",
+		"subclass": "MultiCollateralSynth"
 	}
 ]

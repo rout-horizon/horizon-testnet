@@ -30,18 +30,31 @@ module.exports = async ({
 	runSteps,
 	sourceOf,
 	useOvm,
+	stepName = '',
 }) => {
 	const contractsAddedToSoliditySet = new Set();
 	const instructions = [];
 
 	const internalFunctions = [];
 
+	const customContracts = {};
+	
 	// function to derive a unique name for each new contract
 	const newContractVariableFunctor = name => `new_${name.replace('ext:', '')}_contract`;
 
 	for (const [
 		runIndex,
-		{ skipSolidity, contract, target, writeArg, write, comment, customSolidity },
+		{
+			skipSolidity,
+			contract,
+			target,
+			writeArg,
+			write,
+			comment,
+			customSolidity,
+			customAddress,
+			customSource,
+		},
 	] of Object.entries(runSteps)) {
 		if (skipSolidity || contract.library) {
 			continue;
@@ -50,6 +63,9 @@ module.exports = async ({
 			instructions.push(`// ${comment}`);
 		}
 		try {
+			if (customAddress && customSource) {
+				customContracts[contract] = { address: customAddress, source: customSource };
+			}
 			const { abi } = deployment.sources[sourceOf(target)];
 
 			// set of unique contracts that have owner actions applied and will need to accept ownership
@@ -146,12 +162,26 @@ module.exports = async ({
 				instructions.push(`${contract.toLowerCase()}_i.${write}(${argsForWriteFnc.join(', ')})`);
 			}
 		} catch (err) {
-			console.log(`An error ocurred for ${contract} during solidity generation:`, err.message);
+			console.log(
+				`An error ocurred for ${contract} during solidity generation:`,
+				err.message,
+				target
+			);
 		}
 	}
 
 	const contractsAddedToSolidity = Array.from(contractsAddedToSoliditySet);
 
+	const dedupedSourcesAddedToSolidity = [
+		...new Set(
+			contractsAddedToSolidity.map(contract =>
+				customContracts[contract]
+					? customContracts[contract].source
+					: sourceOf(deployer.deployedContracts[contract])
+			)
+		),
+	];
+	
 	const { releaseName } = getNextRelease({ useOvm });
 
 	const generateExplorerComment = ({ address }) => `// ${explorerLinkPrefix}/address/${address}`;
@@ -161,8 +191,8 @@ module.exports = async ({
 	const solidity = `
 pragma solidity ^0.5.16;
 import "../BaseMigration.sol";
-${contractsAddedToSolidity
-	.map(contract => {
+${dedupedSourcesAddedToSolidity
+	.map(contractSource => {
 		const contractSource = sourceOf(deployer.deployedContracts[contract]);
 		// support legacy contracts in "legacy" subfolder
 		return `import "../${
@@ -175,7 +205,7 @@ interface ISynthetixNamedContract {
 	function CONTRACT_NAME() external view returns (bytes32);
 }
 // solhint-disable contract-name-camelcase
-contract Migration_${releaseName} is BaseMigration {
+contract Migration_${releaseName}${stepName} is BaseMigration {
 	${generateExplorerComment({ address: ownerAddress })};
 	address public constant OWNER = ${ownerAddress};
 	// ----------------------------
@@ -183,8 +213,12 @@ contract Migration_${releaseName} is BaseMigration {
 	// ----------------------------
 	${contractsAddedToSolidity
 		.map(contract => {
-			const sourceContract = sourceOf(deployer.deployedContracts[contract]);
-			const address = addressOf(deployer.deployedContracts[contract]);
+			const sourceContract = customContracts[contract]
+				? customContracts[contract].source
+				: sourceOf(deployer.deployedContracts[contract]);
+			const address = customContracts[contract]
+				? customContracts[contract].address
+				: addressOf(deployer.deployedContracts[contract]);
 			return `${generateExplorerComment({
 				address,
 			})}\n\t${sourceContract} public constant ${contract.toLowerCase()}_i = ${sourceContract}(${address});`;
@@ -247,7 +281,7 @@ contract Migration_${releaseName} is BaseMigration {
 		'..',
 		CONTRACTS_FOLDER,
 		MIGRATIONS_FOLDER,
-		`Migration_${releaseName}.sol`
+		`Migration_${releaseName}${stepName}.sol`
 	);
 	fs.writeFileSync(migrationContractPath, solidity);
 

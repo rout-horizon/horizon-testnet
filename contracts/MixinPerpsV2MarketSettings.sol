@@ -49,7 +49,7 @@ contract MixinPerpsV2MarketSettings is MixinResolver {
     // minimum initial margin
     bytes32 internal constant SETTING_MIN_INITIAL_MARGIN = "perpsV2MinInitialMargin";
     // fixed liquidation fee to be paid to liquidator keeper (not flagger)
-    bytes32 internal constant SETTING_KEEPER_LIQUIRATION_FEE = "keeperLiquidationFee";
+    bytes32 internal constant SETTING_KEEPER_LIQUIDATION_FEE = "keeperLiquidationFee";
 
     /* ---------- Address Resolver Configuration ---------- */
 
@@ -185,6 +185,6 @@ contract MixinPerpsV2MarketSettings is MixinResolver {
     }
 
     function _keeperLiquidationFee() internal view returns (uint) {
-        return _flexibleStorage().getUIntValue(SETTING_CONTRACT_NAME, SETTING_KEEPER_LIQUIRATION_FEE);
+        return _flexibleStorage().getUIntValue(SETTING_CONTRACT_NAME, SETTING_KEEPER_LIQUIDATION_FEE);
     }
 }

@@ -3,6 +3,7 @@ pragma experimental ABIEncoderV2;
 
 // Inheritance
 import "./interfaces/IPerpsV2MarketBaseTypes.sol";
+import "./PerpsV2MarketStateLegacyR1.sol";
 import "./Owned.sol";
 import "./StateShared.sol";
 
@@ -13,6 +14,14 @@ import "./AddressSetLib.sol";
 // solhint-disable-next-line max-states-count
 contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
     using AddressSetLib for AddressSetLib.AddressSet;
+
+    // Legacy state link
+    bool public initialized;
+    uint public legacyFundinSequenceOffset;
+    PerpsV2MarketStateLegacyR1 public legacyState;
+    bool private _legacyContractExists;
+    mapping(address => bool) internal _positionMigrated;
+    mapping(address => bool) internal _delayedOrderMigrated;
 
     // The market identifier in the perpsV2 system (manager + settings). Multiple markets can co-exist
     // for the same asset in order to allow migrations.
@@ -81,15 +90,59 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         address _owner,
         address[] memory _associatedContracts,
         bytes32 _baseAsset,
-        bytes32 _marketKey
+        bytes32 _marketKey,
+        address _legacyState
     ) public Owned(_owner) StateShared(_associatedContracts) {
         baseAsset = _baseAsset;
         marketKey = _marketKey;
 
-        // Initialise the funding sequence with 0 initially accrued, so that the first usable funding index is 1.
-        _fundingSequence.push(0);
+        // Set legacyState
+        if (_legacyState != address(0)) {
+            legacyState = PerpsV2MarketStateLegacyR1(_legacyState);
+            _legacyContractExists = true;
+            // Confirm same asset/market key
+            // Passing the marketKey as parameter and confirming with the legacy allows for double check the intended market is configured
+            require(
+                baseAsset == legacyState.baseAsset() && marketKey == legacyState.marketKey(),
+                "Invalid legacy state baseAsset or marketKey"
+            );
+        }
+    }
 
-        fundingRateLastRecomputed = 0;
+    /*
+     * Links this State contract with the legacy one fixing the latest state on the previous contract.
+     * This function should be called with the market paused to prevent any issue.
+     * Note: It's not called on constructor to allow separation of deployment and
+     * setup/linking and reduce downtime.
+     */
+    function linkOrInitializeState() external onlyOwner {
+        require(!initialized, "State already initialized");
+
+        if (_legacyContractExists) {
+            // copy atomic values
+            marketSize = legacyState.marketSize();
+            marketSkew = legacyState.marketSkew();
+            _entryDebtCorrection = legacyState.entryDebtCorrection();
+            _nextPositionId = legacyState.nextPositionId();
+            fundingLastRecomputed = legacyState.fundingLastRecomputed();
+            fundingRateLastRecomputed = legacyState.fundingRateLastRecomputed();
+            uint legacyFundingSequenceLength = legacyState.fundingSequenceLength() - 1;
+
+            // link fundingSequence
+            // initialize the _fundingSequence array
+            _fundingSequence.push(legacyState.fundingSequence(legacyFundingSequenceLength));
+            // get fundingSequence offset
+            legacyFundinSequenceOffset = legacyFundingSequenceLength;
+        } else {
+            // Initialise the funding sequence with 0 initially accrued, so that the first usable funding index is 1.
+            _fundingSequence.push(0);
+            fundingRateLastRecomputed = 0;
+        }
+
+        // set legacyConfigured
+        initialized = true;
+        // emit event
+        emit MarketStateInitialized(marketKey, _legacyContractExists, address(legacyState), legacyFundinSequenceOffset);
     }
 
     function entryDebtCorrection() external view returns (int128) {
@@ -100,8 +153,16 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         return _nextPositionId;
     }
 
+    function fundingSequence(uint index) external view returns (int128) {
+        if (_legacyContractExists && index < legacyFundinSequenceOffset) {
+            return legacyState.fundingSequence(index);
+        }
+
+        return _fundingSequence[index - legacyFundinSequenceOffset];
+    }
+
     function fundingSequenceLength() external view returns (uint) {
-        return _fundingSequence.length;
+        return legacyFundinSequenceOffset + _fundingSequence.length;
     }
 
     function isFlagged(address account) external view returns (bool) {
@@ -109,13 +170,51 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
     }
 
     function positions(address account) external view returns (Position memory) {
+        // If it doesn't exist here check legacy
+        if (_legacyContractExists && !_positionMigrated[account] && _positions[account].id == 0) {
+            (uint64 id, uint64 lastFundingIndex, uint128 margin, uint128 lastPrice, int128 size) =
+                legacyState.positions(account);
+
+            return Position(id, lastFundingIndex, margin, lastPrice, size);
+        }
+
         return _positions[account];
     }
 
     function delayedOrders(address account) external view returns (DelayedOrder memory) {
+        // If it doesn't exist here check legacy
+        if (_legacyContractExists && !_delayedOrderMigrated[account] && _delayedOrders[account].sizeDelta == 0) {
+            (
+                bool isOffchain,
+                int128 sizeDelta,
+                uint128 desiredFillPrice,
+                uint128 targetRoundId,
+                uint128 commitDeposit,
+                uint128 keeperDeposit,
+                uint256 executableAtTime,
+                uint256 intentionTime,
+                bytes32 trackingCode
+            ) = legacyState.delayedOrders(account);
+            return
+                DelayedOrder(
+                    isOffchain,
+                    sizeDelta,
+                    desiredFillPrice,
+                    targetRoundId,
+                    commitDeposit,
+                    keeperDeposit,
+                    executableAtTime,
+                    intentionTime,
+                    trackingCode
+                );
+        }
+
         return _delayedOrders[account];
     }
 
+    /*
+     * helper function for migration and analytics. Not linked to legacy state
+     */
     function getPositionAddressesPage(uint index, uint pageSize)
         external
         view
@@ -125,63 +224,81 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         return _positionAddresses.getPage(index, pageSize);
     }
 
-    function getDelayedOrderAddressesPage(uint index, uint pageSize)
-        external
-        view
-        returns (address[] memory)
-    {
+    /*
+     * helper function for migration and analytics. Not linked to legacy state
+     */
+    function getDelayedOrderAddressesPage(uint index, uint pageSize) external view returns (address[] memory) {
         return _delayedOrderAddresses.getPage(index, pageSize);
     }
 
-    
+    /*
+     * helper function for migration and analytics. Not linked to legacy state
+     */
     function getFlaggedAddressesPage(uint index, uint pageSize) external view returns (address[] memory) {
         return _flaggedAddresses.getPage(index, pageSize);
     }
-    
+
+    /*
+     * helper function for migration and analytics. Not linked to legacy state
+     */
     function getPositionAddressesLength() external view returns (uint) {
         return _positionAddresses.elements.length;
     }
 
+    /*
+     * helper function for migration and analytics. Not linked to legacy state
+     */
     function getDelayedOrderAddressesLength() external view returns (uint) {
         return _delayedOrderAddresses.elements.length;
     }
 
-    function setMarketKey(bytes32 _marketKey) external onlyAssociatedContracts {
+    /*
+     * helper function for migration and analytics. Not linked to legacy state
+     */
+    function getFlaggedAddressesLength() external view returns (uint) {
+        return _flaggedAddresses.elements.length;
+    }
+
+    function setMarketKey(bytes32 _marketKey) external onlyIfInitialized onlyAssociatedContracts {
         require(marketKey == bytes32(0) || _marketKey == marketKey, "Cannot change market key");
         marketKey = _marketKey;
     }
 
-    function setBaseAsset(bytes32 _baseAsset) external onlyAssociatedContracts {
+    function setBaseAsset(bytes32 _baseAsset) external onlyIfInitialized onlyAssociatedContracts {
         require(baseAsset == bytes32(0) || _baseAsset == baseAsset, "Cannot change base asset");
         baseAsset = _baseAsset;
     }
 
-    function setMarketSize(uint128 _marketSize) external onlyAssociatedContracts {
+    function setMarketSize(uint128 _marketSize) external onlyIfInitialized onlyAssociatedContracts {
         marketSize = _marketSize;
     }
 
-    function setEntryDebtCorrection(int128 entryDebtCorrection) external onlyAssociatedContracts {
+    function setEntryDebtCorrection(int128 entryDebtCorrection) external onlyIfInitialized onlyAssociatedContracts {
         _entryDebtCorrection = entryDebtCorrection;
     }
 
-    function setNextPositionId(uint64 nextPositionId) external onlyAssociatedContracts {
+    function setNextPositionId(uint64 nextPositionId) external onlyIfInitialized onlyAssociatedContracts {
         _nextPositionId = nextPositionId;
     }
 
-    function setMarketSkew(int128 _marketSkew) external onlyAssociatedContracts {
+    function setMarketSkew(int128 _marketSkew) external onlyIfInitialized onlyAssociatedContracts {
         marketSkew = _marketSkew;
     }
 
-    function setFundingLastRecomputed(uint32 lastRecomputed) external onlyAssociatedContracts {
+    function setFundingLastRecomputed(uint32 lastRecomputed) external onlyIfInitialized onlyAssociatedContracts {
         fundingLastRecomputed = lastRecomputed;
     }
 
-    function pushFundingSequence(int128 fundingSequence) external onlyAssociatedContracts {
+    function pushFundingSequence(int128 fundingSequence) external onlyIfInitialized onlyAssociatedContracts {
         _fundingSequence.push(fundingSequence);
     }
 
     // TODO: Perform this update when maxFundingVelocity and skewScale are modified.
-    function setFundingRateLastRecomputed(int128 _fundingRateLastRecomputed) external onlyAssociatedContracts {
+    function setFundingRateLastRecomputed(int128 _fundingRateLastRecomputed)
+        external
+        onlyIfInitialized
+        onlyAssociatedContracts
+    {
         fundingRateLastRecomputed = _fundingRateLastRecomputed;
     }
 
@@ -202,7 +319,15 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         uint128 margin,
         uint128 lastPrice,
         int128 size
-    ) external onlyAssociatedContracts {
+    ) external onlyIfInitialized onlyAssociatedContracts {
+        if (_legacyContractExists && !_positionMigrated[account]) {
+            // Delete (if needed) from legacy state
+            legacyState.deletePosition(account);
+
+            // flag as already migrated
+            _positionMigrated[account] = true;
+        }
+
         _positions[account] = Position(id, lastFundingIndex, margin, lastPrice, size);
         _positionAddresses.add(account);
     }
@@ -231,7 +356,15 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
         uint256 executableAtTime,
         uint256 intentionTime,
         bytes32 trackingCode
-    ) external onlyAssociatedContracts {
+    ) external onlyIfInitialized onlyAssociatedContracts {
+        if (_legacyContractExists && !_delayedOrderMigrated[account]) {
+            // Delete (if needed) from legacy state
+            legacyState.deleteDelayedOrder(account);
+
+            // flag as already migrated
+            _delayedOrderMigrated[account] = true;
+        }
+
         _delayedOrders[account] = DelayedOrder(
             isOffchain,
             sizeDelta,
@@ -251,29 +384,58 @@ contract PerpsV2MarketState is Owned, StateShared, IPerpsV2MarketBaseTypes {
      * @dev Only the associated contract may call this.
      * @param account The account whose position should be deleted.
      */
-    function deletePosition(address account) external onlyAssociatedContracts {
+    function deletePosition(address account) external onlyIfInitialized onlyAssociatedContracts {
         delete _positions[account];
         if (_positionAddresses.contains(account)) {
             _positionAddresses.remove(account);
         }
+
+        if (_legacyContractExists && !_positionMigrated[account]) {
+            legacyState.deletePosition(account);
+
+            // flag as already migrated
+            _positionMigrated[account] = true;
+        }
     }
 
-    function deleteDelayedOrder(address account) external onlyAssociatedContracts {
+    function deleteDelayedOrder(address account) external onlyIfInitialized onlyAssociatedContracts {
         delete _delayedOrders[account];
         if (_delayedOrderAddresses.contains(account)) {
             _delayedOrderAddresses.remove(account);
         }
+
+        // attempt to delete on legacy
+        if (_legacyContractExists && !_delayedOrderMigrated[account]) {
+            legacyState.deleteDelayedOrder(account);
+
+            // flag as already migrated
+            _delayedOrderMigrated[account] = true;
+        }
     }
 
-    function flag(address account, address flagger) external onlyAssociatedContracts {
+    function flag(address account, address flagger) external onlyIfInitialized onlyAssociatedContracts {
         positionFlagger[account] = flagger;
         _flaggedAddresses.add(account);
     }
 
-    function unflag(address account) external onlyAssociatedContracts {
+    function unflag(address account) external onlyIfInitialized onlyAssociatedContracts {
         delete positionFlagger[account];
         if (_flaggedAddresses.contains(account)) {
             _flaggedAddresses.remove(account);
         }
     }
+
+    modifier onlyIfInitialized() {
+        require(initialized, "State not initialized");
+        _;
+    }
+
+    /* ========== EVENTS ========== */
+
+    event MarketStateInitialized(
+        bytes32 indexed marketKey,
+        bool legacyContractExists,
+        address legacyState,
+        uint legacyFundinSequenceOffset
+    );
 }

@@ -446,7 +446,7 @@ contract PerpsV2MarketSettings is Owned, MixinPerpsV2MarketSettings, IPerpsV2Mar
     }
 
     function setKeeperLiquidationFee(uint _keeperFee) external onlyOwner {
-        _flexibleStorage().setUIntValue(SETTING_CONTRACT_NAME, SETTING_KEEPER_LIQUIRATION_FEE, _keeperFee);
+        _flexibleStorage().setUIntValue(SETTING_CONTRACT_NAME, SETTING_KEEPER_LIQUIDATION_FEE, _keeperFee);
         emit KeeperLiquidationFeeUpdated(_keeperFee);
     }
 

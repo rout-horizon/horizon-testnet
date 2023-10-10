@@ -314,6 +314,7 @@ contract PerpsV2MarketViews is PerpsV2MarketBase, IPerpsV2MarketViews {
                 sizeDelta: sizeDelta,
                 oraclePrice: tradePrice,
                 desiredFillPrice: tradePrice,
+                fillPrice: _fillPrice(sizeDelta, tradePrice),
                 makerFee: makerFee,
                 takerFee: takerFee,
                 trackingCode: bytes32(0)

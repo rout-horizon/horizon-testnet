@@ -193,7 +193,6 @@ pragma solidity ^0.5.16;
 import "../BaseMigration.sol";
 ${dedupedSourcesAddedToSolidity
 	.map(contractSource => {
-		const contractSource = sourceOf(deployer.deployedContracts[contract]);
 		// support legacy contracts in "legacy" subfolder
 		return `import "../${
 			/^Legacy/.test(contractSource) ? `legacy/${contractSource}` : contractSource

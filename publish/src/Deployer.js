@@ -228,8 +228,8 @@ class Deployer {
 							key === 'owner'
 								? Promise.resolve(account)
 								: key === 'resolverAddressesRequired'
-								? Promise.resolve([])
-								: undefined,
+									? Promise.resolve([])
+									: undefined,
 					});
 				});
 				deployedContract.address = '0x' + this._dryRunCounter.toString().padStart(40, '0');
@@ -271,8 +271,7 @@ class Deployer {
 
 			console.log(
 				green(
-					`${dryRun ? '[DRY RUN] - Simulated deployment of' : '- Deployed'} ${name} to ${
-						deployedContract.address
+					`${dryRun ? '[DRY RUN] - Simulated deployment of' : '- Deployed'} ${name} to ${deployedContract.address
 					} ${gasUsed ? `used ${(gasUsed / 1e6).toFixed(1)}m in gas` : ''}`
 				)
 			);
@@ -309,9 +308,8 @@ class Deployer {
 			name,
 			address,
 			source,
-			link: `${getExplorerLinkPrefix({ network, useOvm })}/address/${
-				this.deployedContracts[name].address
-			}`,
+			link: `${getExplorerLinkPrefix({ network, useOvm })}/address/${this.deployedContracts[name].address
+				}`,
 			timestamp,
 			txn,
 			network: this.network,
@@ -403,7 +401,7 @@ class Deployer {
 		return new ethers.Contract(address, abi, this.signer);
 	}
 
-	getExistingContract({ contract }) {
+	getExistingContract({ contract, useDeployment = false }) {
 		let address;
 		if (this.network === 'local') {
 			// try find the last replaced contract
@@ -413,6 +411,8 @@ class Deployer {
 			({ address } = this.replacedContracts[contract]
 				? this.replacedContracts[contract]
 				: this.deployment.targets[contract]);
+		} else if (useDeployment === true) {
+			address = this.deployment.targets[contract].address;
 		} else {
 			const contractVersion = getVersions({
 				network: this.network,

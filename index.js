@@ -38,7 +38,11 @@ const chainIdMapping = Object.entries({
 	return memo;
 }, {});
 
-const getNetworkFromId = ({ id }) => chainIdMapping[id];
+/** @type {(obj: {id: number} | number) => number} */
+const getNetworkFromId = obj => {
+	const id = typeof obj === 'number' ? obj : obj.id;
+	return chainIdMapping[id];
+};
 
 const networkToChainId = Object.entries(chainIdMapping).reduce(
 	(memo, [id, { network, useOvm, fork }]) => {

@@ -665,7 +665,7 @@ module.exports = {
 			.option('--run-perps-v2-cleanup', 'Run PerpsV2 post-deployment cleanup')
 			.option(
 				'--perps-v2-markets <market...>',
-				'PerpsV2 Markets to deplot/upgrade. If not present will process all markets'
+				'PerpsV2 Markets to deploy/upgrade. If not present will process all markets'
 			)
 			.option('-y, --yes', 'Dont prompt, just reply yes.')
 			.option('-z, --use-ovm', 'Target deployment for the OVM (Optimism).')

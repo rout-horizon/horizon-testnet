@@ -53,7 +53,7 @@ const deployPerpsV2Generics = async ({
 		});
 	} catch (e) {}
 	const prevFuturesMarketManagerConfig = {};
-	if (useOvm && prevFuturesMarketManager) {
+	if (!useOvm && prevFuturesMarketManager) {
 		const proxiedMarkets = await prevFuturesMarketManager['allMarkets(bool)'](true);
 		const nonProxiedMarkets = await prevFuturesMarketManager['allMarkets(bool)'](false);
 		prevFuturesMarketManagerConfig.proxiedMarkets = proxiedMarkets;
@@ -62,8 +62,8 @@ const deployPerpsV2Generics = async ({
 
 	const futuresMarketManager = await deployer.deployContract({
 		name: 'FuturesMarketManager',
-		source: useOvm ? 'FuturesMarketManager' : 'EmptyFuturesMarketManager',
-		args: useOvm ? [account, addressOf(ReadProxyAddressResolver)] : [],
+		source: !useOvm ? 'FuturesMarketManager' : 'EmptyFuturesMarketManager',
+		args: !useOvm ? [account, addressOf(ReadProxyAddressResolver)] : [],
 		deps: ['ReadProxyAddressResolver'],
 	});
 	contractsRequiringAddressResolver.push({
@@ -71,9 +71,9 @@ const deployPerpsV2Generics = async ({
 		target: futuresMarketManager,
 	});
 
-	if (!useOvm) {
-		return { futuresMarketManager };
-	}
+	// if (useOvm) {
+	// 	return { futuresMarketManager };
+	// }
 
 	if (
 		prevFuturesMarketManager &&
@@ -170,9 +170,9 @@ const deployPerpsV2Markets = async ({
 
 	const updatedContracts = [];
 
-	if (!useOvm) {
-		return;
-	}
+	// if (!useOvm) {
+	// 	return;
+	// }
 
 	const { perpsv2Markets } = loadAndCheckRequiredSources({
 		deploymentPath,
@@ -393,9 +393,9 @@ const cleanupPerpsV2 = async ({
 }) => {
 	console.log(gray(`\n------ CLEANUP PERPS V2 CONFIGURATION ------\n`));
 
-	if (!useOvm) {
-		return;
-	}
+	// if (!useOvm) {
+	// 	return;
+	// }
 
 	const { PerpsV2ExchangeRate: perpsV2ExchangeRate } = deployer.deployedContracts;
 

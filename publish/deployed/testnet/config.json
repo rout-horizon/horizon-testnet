@@ -268,5 +268,23 @@
 	},
 	"ZassetzLINK": {
 		"deploy": false
+	},
+	"PerpsV2MarketLiquidateBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionBNBPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketLiquidateBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentBTCPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionBTCPERP": {
+		"deploy": false
 	}
 }

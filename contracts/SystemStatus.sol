@@ -321,8 +321,8 @@ contract SystemStatus is Owned, ISystemStatus {
         require(
             !systemSuspension.suspended,
             systemSuspension.reason == SUSPENSION_REASON_UPGRADE
-                ? "Synthetix is suspended, upgrade in progress... please stand by"
-                : "Synthetix is suspended. Operation prohibited"
+                ? "Horizon Protocol is suspended, upgrade in progress... please stand by"
+                : "Horizon Protocol is suspended. Operation prohibited"
         );
     }
 
@@ -339,11 +339,11 @@ contract SystemStatus is Owned, ISystemStatus {
     }
 
     function _internalRequireSynthExchangeActive(bytes32 currencyKey) internal view {
-        require(!synthExchangeSuspension[currencyKey].suspended, "Synth exchange suspended. Operation prohibited");
+        require(!synthExchangeSuspension[currencyKey].suspended, "zAsset exchange suspended. Operation prohibited");
     }
 
     function _internalRequireSynthActive(bytes32 currencyKey) internal view {
-        require(!synthSuspension[currencyKey].suspended, "Synth is suspended. Operation prohibited");
+        require(!synthSuspension[currencyKey].suspended, "zAsset is suspended. Operation prohibited");
     }
 
     function _internalRequireFuturesMarketActive(bytes32 marketKey) internal view {

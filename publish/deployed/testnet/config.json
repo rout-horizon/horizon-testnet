@@ -286,5 +286,26 @@
 	},
 	"PerpsV2DelayedExecutionBTCPERP": {
 		"deploy": false
+	},
+	"PerpsV2ProxyETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketStateETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketLiquidateETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedIntentETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2DelayedExecutionETHPERP": {
+		"deploy": false
+	},
+	"PerpsV2MarketViewsETHPERP": {
+		"deploy": false
 	}
 }

@@ -1306,10 +1306,10 @@
 		},
 		"PerpsV2ProxyETHPERP": {
 			"name": "PerpsV2ProxyETHPERP",
-			"address": "0xBac900E98eaFFeFa5d04A98621B5dfBAe76cc9c9",
+			"address": "0x489B2B3370C667E53332aa1c82A0203338bd969E",
 			"source": "ProxyPerpsV2",
-			"link": "https://testnet.bscscan.com/address/0xBac900E98eaFFeFa5d04A98621B5dfBAe76cc9c9",
-			"timestamp": "2023-11-13T19:31:33.492Z",
+			"link": "https://testnet.bscscan.com/address/0x489B2B3370C667E53332aa1c82A0203338bd969E",
+			"timestamp": "2023-11-14T10:33:14.062Z",
 			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
@@ -1318,10 +1318,10 @@
 		},
 		"PerpsV2MarketStateETHPERP": {
 			"name": "PerpsV2MarketStateETHPERP",
-			"address": "0xEa86bD1BEF57554AA23a027123A5A78C8542E6C6",
+			"address": "0x7C9C12272740ECB84539090dd4B99931ef511dA9",
 			"source": "PerpsV2MarketState",
-			"link": "https://testnet.bscscan.com/address/0xEa86bD1BEF57554AA23a027123A5A78C8542E6C6",
-			"timestamp": "2023-11-13T19:31:59.183Z",
+			"link": "https://testnet.bscscan.com/address/0x7C9C12272740ECB84539090dd4B99931ef511dA9",
+			"timestamp": "2023-11-14T10:33:24.917Z",
 			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
@@ -1329,81 +1329,81 @@
 				[
 					"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7"
 				],
-				"0x7345544800000000000000000000000000000000000000000000000000000000",
-				"0x7345544850455250000000000000000000000000000000000000000000000000",
+				"0x7a45544800000000000000000000000000000000000000000000000000000000",
+				"0x7a45544850455250000000000000000000000000000000000000000000000000",
 				"0x0000000000000000000000000000000000000000"
 			]
 		},
 		"PerpsV2MarketETHPERP": {
 			"name": "PerpsV2MarketETHPERP",
-			"address": "0x87E5B0f597D79817e10F6F428B0A9a5c18A8C6f8",
+			"address": "0xC18117d68e302dE2A433ec3D33c695EB7885Db22",
 			"source": "PerpsV2Market",
-			"link": "https://testnet.bscscan.com/address/0x87E5B0f597D79817e10F6F428B0A9a5c18A8C6f8",
-			"timestamp": "2023-11-13T19:32:21.495Z",
+			"link": "https://testnet.bscscan.com/address/0xC18117d68e302dE2A433ec3D33c695EB7885Db22",
+			"timestamp": "2023-11-14T10:33:38.327Z",
 			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
-				"0xBac900E98eaFFeFa5d04A98621B5dfBAe76cc9c9",
-				"0xEa86bD1BEF57554AA23a027123A5A78C8542E6C6",
+				"0x489B2B3370C667E53332aa1c82A0203338bd969E",
+				"0x7C9C12272740ECB84539090dd4B99931ef511dA9",
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
 				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
 			]
 		},
 		"PerpsV2MarketLiquidateETHPERP": {
 			"name": "PerpsV2MarketLiquidateETHPERP",
-			"address": "0x9414A9933B7d44F560CF5B4eF4eB6C416325e3cc",
+			"address": "0xE409d195E268ed48248F4d6078Ee4d33cAF9CCAC",
 			"source": "PerpsV2MarketLiquidate",
-			"link": "https://testnet.bscscan.com/address/0x9414A9933B7d44F560CF5B4eF4eB6C416325e3cc",
-			"timestamp": "2023-11-13T19:32:47.650Z",
+			"link": "https://testnet.bscscan.com/address/0xE409d195E268ed48248F4d6078Ee4d33cAF9CCAC",
+			"timestamp": "2023-11-14T10:34:04.362Z",
 			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
-				"0xBac900E98eaFFeFa5d04A98621B5dfBAe76cc9c9",
-				"0xEa86bD1BEF57554AA23a027123A5A78C8542E6C6",
+				"0x489B2B3370C667E53332aa1c82A0203338bd969E",
+				"0x7C9C12272740ECB84539090dd4B99931ef511dA9",
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
 				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
 			]
 		},
 		"PerpsV2DelayedIntentETHPERP": {
 			"name": "PerpsV2DelayedIntentETHPERP",
-			"address": "0x69E0235F6dE3A838f381b31d864e4B723cB4DB5f",
+			"address": "0x31ca1BC0925052d7Dc0db921550a8628811F123a",
 			"source": "PerpsV2MarketDelayedIntent",
-			"link": "https://testnet.bscscan.com/address/0x69E0235F6dE3A838f381b31d864e4B723cB4DB5f",
-			"timestamp": "2023-11-13T19:33:09.509Z",
+			"link": "https://testnet.bscscan.com/address/0x31ca1BC0925052d7Dc0db921550a8628811F123a",
+			"timestamp": "2023-11-14T10:34:28.075Z",
 			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
-				"0xBac900E98eaFFeFa5d04A98621B5dfBAe76cc9c9",
-				"0xEa86bD1BEF57554AA23a027123A5A78C8542E6C6",
+				"0x489B2B3370C667E53332aa1c82A0203338bd969E",
+				"0x7C9C12272740ECB84539090dd4B99931ef511dA9",
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
 				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
 			]
 		},
 		"PerpsV2DelayedExecutionETHPERP": {
 			"name": "PerpsV2DelayedExecutionETHPERP",
-			"address": "0x693B3b8Cc24b6E9BE8111C212c0275b66290eAd6",
+			"address": "0x6E9DF00e67E586b40d48623Fa344C88BC83D85e0",
 			"source": "PerpsV2MarketDelayedExecution",
-			"link": "https://testnet.bscscan.com/address/0x693B3b8Cc24b6E9BE8111C212c0275b66290eAd6",
-			"timestamp": "2023-11-13T19:33:32.460Z",
+			"link": "https://testnet.bscscan.com/address/0x6E9DF00e67E586b40d48623Fa344C88BC83D85e0",
+			"timestamp": "2023-11-14T10:34:49.808Z",
 			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
-				"0xBac900E98eaFFeFa5d04A98621B5dfBAe76cc9c9",
-				"0xEa86bD1BEF57554AA23a027123A5A78C8542E6C6",
+				"0x489B2B3370C667E53332aa1c82A0203338bd969E",
+				"0x7C9C12272740ECB84539090dd4B99931ef511dA9",
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
 				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
 			]
 		},
 		"PerpsV2MarketViewsETHPERP": {
 			"name": "PerpsV2MarketViewsETHPERP",
-			"address": "0x1aEe88d928779604094724C054123F2690770619",
+			"address": "0x99b589C0AC3BF043cCa99086eb031B30181f2767",
 			"source": "PerpsV2MarketViews",
-			"link": "https://testnet.bscscan.com/address/0x1aEe88d928779604094724C054123F2690770619",
-			"timestamp": "2023-11-13T19:33:58.292Z",
+			"link": "https://testnet.bscscan.com/address/0x99b589C0AC3BF043cCa99086eb031B30181f2767",
+			"timestamp": "2023-11-14T10:35:16.580Z",
 			"txn": "",
 			"network": "testnet",
 			"constructorArgs": [
-				"0xEa86bD1BEF57554AA23a027123A5A78C8542E6C6",
+				"0x7C9C12272740ECB84539090dd4B99931ef511dA9",
 				"0x59Da1c6f893a8071d9aA6d8A3c292aC41074c5B7",
 				"0x53Da7424205B75e79Bb3Ae401264b93071F42284"
 			]

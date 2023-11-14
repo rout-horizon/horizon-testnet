@@ -56,8 +56,8 @@
 		"offchainPaused": false
 	},
 	{
-		"marketKey": "sETHPERP",
-		"asset": "sETH",
+		"marketKey": "zETHPERP",
+		"asset": "zETH",
 		"makerFee": "0.3",
 		"takerFee": "0.3",
 		"takerFeeDelayedOrder": "0.3",
